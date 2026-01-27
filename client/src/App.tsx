@@ -10,6 +10,7 @@ import CompanyProfile from "./pages/CompanyProfile";
 import Comparison from "./pages/Comparison";
 import Favorites from "./pages/Favorites";
 import SavedComparisons from "./pages/SavedComparisons";
+import SalaryBenchmark from "./pages/SalaryBenchmark";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -22,6 +23,7 @@ function Router() {
       <Route path={"/compare"} component={Comparison} />
       <Route path={"/favorites"} component={Favorites} />
       <Route path={"/saved-comparisons"} component={SavedComparisons} />
+      <Route path={"/salary-benchmark"} component={SalaryBenchmark} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

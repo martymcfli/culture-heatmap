@@ -115,16 +115,16 @@
 
 
 ## Dark Modern Theme & Design Update
-- [ ] Update global CSS with dark color palette
-- [ ] Configure Tailwind for dark mode
-- [ ] Add network visualization background to Home page
-- [ ] Create floating action buttons component
-- [ ] Add smooth animations and transitions
-- [ ] Update all pages with dark theme
-- [ ] Update card and component styling for dark mode
-- [ ] Add gradient overlays and glow effects
-- [ ] Test responsive design with new theme
-- [ ] Verify accessibility with dark theme
+- [x] Update global CSS with dark color palette
+- [x] Configure Tailwind for dark mode
+- [x] Add network visualization background to Home page
+- [x] Create floating action buttons component
+- [x] Add smooth animations and transitions
+- [x] Update all pages with dark theme
+- [x] Update card and component styling for dark mode
+- [x] Add gradient overlays and glow effects
+- [x] Test responsive design with new theme
+- [x] Verify accessibility with dark theme
 
 
 ## Bug Fixes
@@ -142,3 +142,22 @@
 - [x] Add search bar with autocomplete suggestions
 - [x] Add recent search history feature
 - [x] Test all navigation and search functionality
+
+
+## Salary Benchmarking Feature
+- [x] Create salaryData table in database schema (role, level, baseSalary, bonus, equity, benefits)
+- [x] Seed salary data for 100+ companies with multiple roles and levels (1,664 entries)
+- [x] Create tRPC procedures for fetching salary data with filters
+- [x] Build Salary Benchmarking page with role/level/company filters
+- [x] Create salary comparison charts (bar, box plot, scatter)
+- [x] Add salary data display to company profile pages
+- [x] Implement salary range statistics (min, max, median, average, percentiles)
+- [x] Add salary trend analysis over time
+- [x] Create salary comparison export functionality
+- [x] Write vitest tests for salary procedures (8 tests passing)
+
+## Company Database Expansion
+- [x] Add 60 additional companies across all sectors (54 new + 6 existing)
+- [x] Update all references from 50+ to 100+ companies
+- [x] Verify all company data is properly seeded (104 total companies)
+- [x] Test filtering and search with expanded dataset

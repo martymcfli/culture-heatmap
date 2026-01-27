@@ -88,7 +88,7 @@ export default function Home() {
             </h2>
 
             <p className="text-lg text-foreground/70 mb-8 leading-relaxed">
-              Discover and compare workplace environments across 50+ leading tech companies. Access aggregated ratings from
+              Discover and compare workplace environments across 100+ leading companies across tech, finance, healthcare, and more. Access aggregated ratings from
               Glassdoor, Indeed, and Comparably to find companies that match your values and career goals.
             </p>
 

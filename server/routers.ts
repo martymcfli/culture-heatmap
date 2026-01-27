@@ -208,6 +208,48 @@ export const appRouter = router({
         return flagReview(input);
       }),
   }),
+
+  salary: router({
+    getByCompany: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getSalaryDataByCompany } = await import('./db');
+        return getSalaryDataByCompany(input);
+      }),
+
+    compare: publicProcedure
+      .input(z.object({
+        jobTitle: z.string().optional(),
+        level: z.string().optional(),
+        companyIds: z.array(z.number()).optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getSalaryComparison } = await import('./db');
+        return getSalaryComparison(input);
+      }),
+
+    stats: publicProcedure
+      .input(z.object({
+        jobTitle: z.string(),
+        level: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getSalaryStats } = await import('./db');
+        return getSalaryStats(input.jobTitle, input.level);
+      }),
+
+    jobTitles: publicProcedure
+      .query(async () => {
+        const { getUniqueJobTitles } = await import('./db');
+        return getUniqueJobTitles();
+      }),
+
+    levels: publicProcedure
+      .query(async () => {
+        const { getUniqueLevels } = await import('./db');
+        return getUniqueLevels();
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

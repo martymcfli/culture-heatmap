@@ -201,3 +201,24 @@ export const savedComparisons = mysqlTable("savedComparisons", {
 
 export type SavedComparison = typeof savedComparisons.$inferSelect;
 export type InsertSavedComparison = typeof savedComparisons.$inferInsert;
+
+// Salary data table
+export const salaryData = mysqlTable("salaryData", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  jobTitle: varchar("jobTitle", { length: 255 }).notNull(),
+  level: varchar("level", { length: 50 }).notNull(),
+  baseSalary: decimal("baseSalary", { precision: 12, scale: 2 }).notNull(),
+  bonus: decimal("bonus", { precision: 12, scale: 2 }),
+  equity: decimal("equity", { precision: 12, scale: 2 }),
+  totalCompensation: decimal("totalCompensation", { precision: 12, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  location: varchar("location", { length: 255 }),
+  yearsExperience: int("yearsExperience"),
+  dataSource: varchar("dataSource", { length: 100 }),
+  lastUpdated: date("lastUpdated"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SalaryData = typeof salaryData.$inferSelect;
+export type InsertSalaryData = typeof salaryData.$inferInsert;

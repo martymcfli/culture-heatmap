@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview, jobOpenings, InsertJobOpening, companyNews, InsertCompanyNews, userFavorites, InsertUserFavorite, savedComparisons, InsertSavedComparison } from "../drizzle/schema";
+import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview, jobOpenings, InsertJobOpening, companyNews, InsertCompanyNews, userFavorites, InsertUserFavorite, savedComparisons, InsertSavedComparison, salaryData, SalaryData } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -440,6 +440,84 @@ export async function deleteComparison(id: number) {
   
   return db.delete(savedComparisons)
     .where(eq(savedComparisons.id, id));
+}
+
+// Salary Data queries
+export async function getSalaryDataByCompany(companyId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(salaryData)
+    .where(eq(salaryData.companyId, companyId))
+    .orderBy(salaryData.jobTitle, salaryData.level);
+}
+
+export async function getSalaryComparison(filters: {
+  jobTitle?: string;
+  level?: string;
+  companyIds?: number[];
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let allData = await db.select().from(salaryData);
+  
+  if (filters.jobTitle) {
+    allData = allData.filter(d => d.jobTitle === filters.jobTitle);
+  }
+  if (filters.level) {
+    allData = allData.filter(d => d.level === filters.level);
+  }
+  if (filters.companyIds && filters.companyIds.length > 0) {
+    allData = allData.filter(d => filters.companyIds!.includes(d.companyId));
+  }
+  
+  return allData;
+}
+
+export async function getSalaryStats(jobTitle: string, level: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const data = await db.select()
+    .from(salaryData)
+    .where(eq(salaryData.jobTitle, jobTitle) && eq(salaryData.level, level));
+  
+  if (data.length === 0) return null;
+  
+  const salaries = data.map(d => parseFloat(String(d.totalCompensation || 0)));
+  const sorted = salaries.sort((a, b) => a - b);
+  
+  return {
+    count: data.length,
+    min: Math.min(...salaries),
+    max: Math.max(...salaries),
+    median: sorted[Math.floor(sorted.length / 2)],
+    average: salaries.reduce((a, b) => a + b, 0) / salaries.length,
+    p25: sorted[Math.floor(sorted.length * 0.25)],
+    p75: sorted[Math.floor(sorted.length * 0.75)],
+  };
+}
+
+export async function getUniqueJobTitles() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const data = await db.select({ jobTitle: salaryData.jobTitle }).from(salaryData);
+  const uniqueSet = new Set(data.map(d => d.jobTitle));
+  const unique = Array.from(uniqueSet);
+  return unique.sort();
+}
+
+export async function getUniqueLevels() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const data = await db.select({ level: salaryData.level }).from(salaryData);
+  const uniqueSet = new Set(data.map(d => d.level));
+  const unique = Array.from(uniqueSet);
+  return unique.sort();
 }
 
 // TODO: add feature queries here as your schema grows.
