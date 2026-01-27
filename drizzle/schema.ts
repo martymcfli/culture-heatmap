@@ -113,3 +113,27 @@ export const companyReviews = mysqlTable("companyReviews", {
 
 export type CompanyReview = typeof companyReviews.$inferSelect;
 export type InsertCompanyReview = typeof companyReviews.$inferInsert;
+
+// Anonymous user reviews table
+export const anonymousReviews = mysqlTable("anonymousReviews", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  rating: decimal("rating", { precision: 3, scale: 2 }).notNull(),
+  title: varchar("title", { length: 255 }),
+  reviewText: text("reviewText"),
+  pros: text("pros"),
+  cons: text("cons"),
+  jobTitle: varchar("jobTitle", { length: 255 }),
+  employmentStatus: varchar("employmentStatus", { length: 50 }), // "current", "former", "interviewing"
+  workLifeBalance: decimal("workLifeBalance", { precision: 3, scale: 2 }),
+  compensationBenefits: decimal("compensationBenefits", { precision: 3, scale: 2 }),
+  careerOpportunities: decimal("careerOpportunities", { precision: 3, scale: 2 }),
+  cultureValues: decimal("cultureValues", { precision: 3, scale: 2 }),
+  seniorManagement: decimal("seniorManagement", { precision: 3, scale: 2 }),
+  isHelpful: int("isHelpful").default(0), // Count of helpful votes
+  isFlagged: int("isFlagged").default(0), // Flag for inappropriate content
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AnonymousReview = typeof anonymousReviews.$inferSelect;
+export type InsertAnonymousReview = typeof anonymousReviews.$inferInsert;

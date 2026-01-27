@@ -53,6 +53,54 @@ export const appRouter = router({
         return getFilteredCompanies(input);
       }),
   }),
+
+  reviews: router({
+    submit: publicProcedure
+      .input(z.object({
+        companyId: z.number(),
+        rating: z.number().min(1).max(5),
+        title: z.string().max(255).optional(),
+        reviewText: z.string().optional(),
+        pros: z.string().optional(),
+        cons: z.string().optional(),
+        jobTitle: z.string().max(255).optional(),
+        employmentStatus: z.enum(["current", "former", "interviewing"]).optional(),
+        workLifeBalance: z.number().min(1).max(5).optional(),
+        compensationBenefits: z.number().min(1).max(5).optional(),
+        careerOpportunities: z.number().min(1).max(5).optional(),
+        cultureValues: z.number().min(1).max(5).optional(),
+        seniorManagement: z.number().min(1).max(5).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { submitReview } = await import('./db');
+        return submitReview(input);
+      }),
+
+    getByCompany: publicProcedure
+      .input(z.object({
+        companyId: z.number(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getCompanyReviews } = await import('./db');
+        return getCompanyReviews(input.companyId, input.limit || 20, input.offset || 0);
+      }),
+
+    getStats: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getReviewStats } = await import('./db');
+        return getReviewStats(input);
+      }),
+
+    flag: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { flagReview } = await import('./db');
+        return flagReview(input);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

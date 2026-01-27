@@ -5,6 +5,8 @@ import { Loader2, ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
+import ReviewForm from "@/components/ReviewForm";
+import ReviewList from "@/components/ReviewList";
 
 export default function CompanyProfile() {
   const [, params] = useRoute("/company/:id");
@@ -260,7 +262,7 @@ export default function CompanyProfile() {
         )}
 
         {/* Scores by Source */}
-        <Card>
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle>Scores by Source</CardTitle>
             <CardDescription>Ratings from different review platforms</CardDescription>
@@ -304,6 +306,14 @@ export default function CompanyProfile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Review Form */}
+        <div className="mb-8">
+          <ReviewForm companyId={company.id} />
+        </div>
+
+        {/* Review List */}
+        <ReviewList companyId={company.id} />
       </div>
     </div>
   );

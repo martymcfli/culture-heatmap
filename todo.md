@@ -52,3 +52,15 @@
 ## Deployment
 - [ ] Final checkpoint before publishing
 - [ ] Deploy to production
+
+
+## Anonymous Review Submission Feature
+- [x] Create anonymousReviews table in database schema
+- [x] Add tRPC procedure to submit anonymous reviews
+- [x] Add tRPC procedure to fetch reviews for a company
+- [x] Build review submission form component
+- [x] Display recent reviews on company profile page
+- [x] Add review filtering and sorting (by date, rating, helpfulness)
+- [x] Implement review moderation flags (inappropriate content)
+- [x] Add vitest tests for review procedures
+- [x] Polish UI and add animations

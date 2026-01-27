@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents } from "../drizzle/schema";
+import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -226,6 +226,95 @@ export async function getCompaniesWithAggregateScores(limit = 100, offset = 0) {
   );
   
   return companiesWithScores.slice(offset, offset + limit);
+}
+
+// Anonymous reviews queries
+export async function submitReview(reviewData: {
+  companyId: number;
+  rating: number;
+  title?: string;
+  reviewText?: string;
+  pros?: string;
+  cons?: string;
+  jobTitle?: string;
+  employmentStatus?: string;
+  workLifeBalance?: number;
+  compensationBenefits?: number;
+  careerOpportunities?: number;
+  cultureValues?: number;
+  seniorManagement?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Convert numbers to strings for decimal fields
+  const review: InsertAnonymousReview = {
+    companyId: reviewData.companyId,
+    rating: reviewData.rating.toString(),
+    title: reviewData.title,
+    reviewText: reviewData.reviewText,
+    pros: reviewData.pros,
+    cons: reviewData.cons,
+    jobTitle: reviewData.jobTitle,
+    employmentStatus: reviewData.employmentStatus,
+    workLifeBalance: reviewData.workLifeBalance?.toString(),
+    compensationBenefits: reviewData.compensationBenefits?.toString(),
+    careerOpportunities: reviewData.careerOpportunities?.toString(),
+    cultureValues: reviewData.cultureValues?.toString(),
+    seniorManagement: reviewData.seniorManagement?.toString(),
+  };
+  
+  const result = await db.insert(anonymousReviews).values(review);
+  return result;
+}
+
+export async function getCompanyReviews(companyId: number, limit = 20, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(anonymousReviews)
+    .where(eq(anonymousReviews.companyId, companyId))
+    .orderBy(desc(anonymousReviews.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getReviewStats(companyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const reviews = await db.select()
+    .from(anonymousReviews)
+    .where(eq(anonymousReviews.companyId, companyId));
+  
+  if (reviews.length === 0) return null;
+  
+  const avg = (field: keyof typeof reviews[0]) => {
+    const values = reviews
+      .map(r => parseFloat(String(r[field] || 0)))
+      .filter(v => !isNaN(v));
+    return values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : "0";
+  };
+  
+  return {
+    totalReviews: reviews.length,
+    averageRating: avg('rating'),
+    averageWorkLifeBalance: avg('workLifeBalance'),
+    averageCompensation: avg('compensationBenefits'),
+    averageCareer: avg('careerOpportunities'),
+    averageCulture: avg('cultureValues'),
+    averageManagement: avg('seniorManagement'),
+  };
+}
+
+export async function flagReview(reviewId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(anonymousReviews)
+    .set({ isFlagged: 1 })
+    .where(eq(anonymousReviews.id, reviewId));
 }
 
 // TODO: add feature queries here as your schema grows.
