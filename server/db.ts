@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -87,6 +87,145 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+// Company queries
+export async function getCompanies(limit = 100, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(companies).limit(limit).offset(offset);
+}
+
+export async function getCompanyById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(companies).where(eq(companies.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function searchCompanies(query: string, limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  // Get all companies and filter in memory
+  const allCompanies = await db.select().from(companies);
+  return allCompanies
+    .filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
+    .slice(0, limit);
+}
+
+export async function getCompanyWithScores(companyId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const company = await getCompanyById(companyId);
+  if (!company) return undefined;
+  
+  const scores = await db.select().from(cultureScores)
+    .where(eq(cultureScores.companyId, companyId));
+  
+  const trends = await db.select().from(cultureTrends)
+    .where(eq(cultureTrends.companyId, companyId));
+  
+  const layoffs = await db.select().from(layoffEvents)
+    .where(eq(layoffEvents.companyId, companyId));
+  
+  return { company, scores, trends, layoffs };
+}
+
+export async function getAggregateScore(companyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const scores = await db.select().from(cultureScores)
+    .where(eq(cultureScores.companyId, companyId));
+  
+  if (scores.length === 0) return null;
+  
+  // Calculate average across all sources
+  const avg = (field: keyof typeof scores[0]) => {
+    const values = scores
+      .map(s => parseFloat(String(s[field] || 0)))
+      .filter(v => !isNaN(v));
+    return values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+  };
+  
+  return {
+    overallRating: avg('overallRating'),
+    workLifeBalance: avg('workLifeBalance'),
+    compensationBenefits: avg('compensationBenefits'),
+    careerOpportunities: avg('careerOpportunities'),
+    cultureValues: avg('cultureValues'),
+    seniorManagement: avg('seniorManagement'),
+    ceoApproval: avg('ceoApproval'),
+    recommendToFriend: avg('recommendToFriend'),
+  };
+}
+
+export async function getFilteredCompanies(filters: {
+  location?: string;
+  industry?: string;
+  sizeRange?: string;
+  minScore?: number;
+  maxScore?: number;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get all companies and filter in memory
+  let results = await db.select().from(companies);
+  
+  if (filters.location) {
+    results = results.filter(c => 
+      `${c.headquartersCity}, ${c.headquartersState}`.toLowerCase().includes(filters.location!.toLowerCase())
+    );
+  }
+  
+  if (filters.industry) {
+    results = results.filter(c => c.industry === filters.industry);
+  }
+  
+  if (filters.sizeRange) {
+    results = results.filter(c => c.sizeRange === filters.sizeRange);
+  }
+  
+  // Filter by score if needed
+  if (filters.minScore !== undefined || filters.maxScore !== undefined) {
+    const filtered = [];
+    for (const company of results) {
+      const aggregate = await getAggregateScore(company.id);
+      if (!aggregate) continue;
+      
+      const score = aggregate.overallRating;
+      if (filters.minScore !== undefined && score < filters.minScore) continue;
+      if (filters.maxScore !== undefined && score > filters.maxScore) continue;
+      
+      filtered.push(company);
+    }
+    results = filtered;
+  }
+  
+  // Apply pagination
+  const offset = filters.offset || 0;
+  const limit = filters.limit || 100;
+  return results.slice(offset, offset + limit);
+}
+
+export async function getCompaniesWithAggregateScores(limit = 100, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const allCompanies = await db.select().from(companies);
+  
+  const companiesWithScores = await Promise.all(
+    allCompanies.map(async (company) => {
+      const aggregate = await getAggregateScore(company.id);
+      return { ...company, aggregateScore: aggregate };
+    })
+  );
+  
+  return companiesWithScores.slice(offset, offset + limit);
 }
 
 // TODO: add feature queries here as your schema grows.

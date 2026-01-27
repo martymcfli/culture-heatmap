@@ -5,12 +5,19 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import HeatMap from "./pages/HeatMap";
+import CompanyProfile from "./pages/CompanyProfile";
+import Comparison from "./pages/Comparison";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/heatmap"} component={HeatMap} />
+      <Route path={"/browse"} component={HeatMap} />
+      <Route path={"/company/:id"} component={CompanyProfile} />
+      <Route path={"/compare"} component={Comparison} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
