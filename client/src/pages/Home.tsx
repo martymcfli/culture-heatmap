@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Zap, Users, TrendingUp, Heart, Compass, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
@@ -16,7 +17,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Network Background */}
       <div
-        className="fixed inset-0 z-0 opacity-40"
+        className="fixed inset-0 z-0 opacity-70"
         style={{
           backgroundImage: "url(/network-bg.png)",
           backgroundSize: "cover",
@@ -26,7 +27,7 @@ export default function Home() {
       />
 
       {/* Gradient Overlay */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-background/50 via-background/40 to-background/60" />
 
       {/* Content */}
       <div className="relative z-10">

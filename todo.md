@@ -125,3 +125,9 @@
 - [ ] Add gradient overlays and glow effects
 - [ ] Test responsive design with new theme
 - [ ] Verify accessibility with dark theme
+
+
+## Bug Fixes
+- [x] Fix browse tab navigation not working
+- [x] Fix heatmap tab navigation not working
+- [x] Adjust background opacity for better content visibility
