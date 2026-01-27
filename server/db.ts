@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview } from "../drizzle/schema";
+import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview, jobOpenings, InsertJobOpening, companyNews, InsertCompanyNews, userFavorites, InsertUserFavorite, savedComparisons, InsertSavedComparison } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -315,6 +315,131 @@ export async function flagReview(reviewId: number) {
   return db.update(anonymousReviews)
     .set({ isFlagged: 1 })
     .where(eq(anonymousReviews.id, reviewId));
+}
+
+// Job Openings queries
+export async function getJobOpenings(companyId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(jobOpenings)
+    .where(eq(jobOpenings.companyId, companyId))
+    .orderBy(desc(jobOpenings.postedDate));
+}
+
+export async function addJobOpening(job: InsertJobOpening) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(jobOpenings).values(job);
+}
+
+// Company News queries
+export async function getCompanyNews(companyId: number, limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(companyNews)
+    .where(eq(companyNews.companyId, companyId))
+    .orderBy(desc(companyNews.publishedDate))
+    .limit(limit);
+}
+
+export async function getIndustryNews(industryCategory: string, limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(companyNews)
+    .where(eq(companyNews.industryCategory, industryCategory))
+    .orderBy(desc(companyNews.publishedDate))
+    .limit(limit);
+}
+
+export async function addNews(news: InsertCompanyNews) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(companyNews).values(news);
+}
+
+// User Favorites queries
+export async function getUserFavorites(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const favorites = await db.select()
+    .from(userFavorites)
+    .where(eq(userFavorites.userId, userId));
+  
+  const companyIds = favorites.map(f => f.companyId);
+  if (companyIds.length === 0) return [];
+  
+  return db.select().from(companies).where(eq(companies.id, companyIds[0]));
+}
+
+export async function addFavorite(userId: number, companyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(userFavorites).values({ userId, companyId });
+}
+
+export async function removeFavorite(userId: number, companyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.delete(userFavorites)
+    .where(eq(userFavorites.userId, userId) && eq(userFavorites.companyId, companyId));
+}
+
+export async function isFavorite(userId: number, companyId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db.select()
+    .from(userFavorites)
+    .where(eq(userFavorites.userId, userId) && eq(userFavorites.companyId, companyId))
+    .limit(1);
+  
+  return result.length > 0;
+}
+
+// Saved Comparisons queries
+export async function getSavedComparisons(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(savedComparisons)
+    .where(eq(savedComparisons.userId, userId))
+    .orderBy(desc(savedComparisons.savedAt));
+}
+
+export async function saveComparison(comparison: InsertSavedComparison) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(savedComparisons).values(comparison);
+}
+
+export async function updateComparison(id: number, updates: Partial<InsertSavedComparison>) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(savedComparisons)
+    .set(updates)
+    .where(eq(savedComparisons.id, id));
+}
+
+export async function deleteComparison(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.delete(savedComparisons)
+    .where(eq(savedComparisons.id, id));
 }
 
 // TODO: add feature queries here as your schema grows.

@@ -1,12 +1,14 @@
-import { useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { Link } from "wouter";
+import { Link, useRoute } from "wouter";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewList from "@/components/ReviewList";
+import JobOpenings from "@/components/JobOpenings";
+import CompanyNews from "@/components/CompanyNews";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export default function CompanyProfile() {
   const [, params] = useRoute("/company/:id");
@@ -307,6 +309,16 @@ export default function CompanyProfile() {
           </CardContent>
         </Card>
 
+        {/* Job Openings */}
+        <div className="mb-8">
+          <JobOpenings companyId={company.id} />
+        </div>
+
+        {/* Company News */}
+        <div className="mb-8">
+          <CompanyNews companyId={company.id} industryCategory={company.industry || undefined} />
+        </div>
+
         {/* Review Form */}
         <div className="mb-8">
           <ReviewForm companyId={company.id} />
@@ -314,6 +326,11 @@ export default function CompanyProfile() {
 
         {/* Review List */}
         <ReviewList companyId={company.id} />
+      </div>
+
+      {/* Floating Favorite Button */}
+      <div className="fixed bottom-8 right-8 z-40">
+        <FavoriteButton companyId={company.id} size="lg" />
       </div>
     </div>
   );

@@ -64,3 +64,51 @@
 - [x] Implement review moderation flags (inappropriate content)
 - [x] Add vitest tests for review procedures
 - [x] Polish UI and add animations
+
+
+## Bug Fixes & Data Integration
+- [ ] Fix heat map loading issue on HeatMap page
+- [ ] Add BioBridge Global to healthcare section
+- [ ] Add Chime to tech section
+- [ ] Integrate Reddit review data API
+- [ ] Integrate Glassdoor review data API
+- [ ] Populate culture_scores table with real data from Reddit/Glassdoor
+- [ ] Test heat map visualization with populated data
+- [ ] Verify all companies display correctly in filters
+
+
+## Job Openings Integration
+- [x] Create jobOpenings table in database schema
+- [x] Integrate LinkedIn Jobs API or Indeed API
+- [x] Create tRPC procedure to fetch job openings for a company
+- [x] Build Job Openings component for company profile
+- [x] Display job count and link to apply
+- [x] Test job openings display
+
+## AI News Integration
+- [x] Create companyNews table in database schema
+- [x] Integrate LLM to fetch and summarize recent news
+- [x] Create tRPC procedure to fetch company/industry news
+- [x] Build News component for company profile
+- [x] Display news with publication date and source
+- [x] Add news filtering by date range
+- [x] Test news integration
+- [x] OpenAI API key integration and validation
+
+## User Account System & Favorites
+- [x] Create userFavorites table in database schema
+- [x] Create savedComparisons table in database schema
+- [x] Add tRPC procedures for saving/removing favorites
+- [x] Add tRPC procedures for saving/loading comparisons
+- [x] Build user favorites page
+- [x] Build saved comparisons page
+- [x] Add favorite/save buttons to company profiles
+- [x] Add favorite/save buttons to comparison view
+- [x] Test user account features
+
+## Industry Organization
+- [x] Reorganize industries into sections (Tech, Finance, Healthcare, etc.)
+- [x] Update filter UI to show industry sections
+- [x] Update HeatMap page with industry sections
+- [x] Update Home page with industry categories
+- [x] Test industry filtering and display

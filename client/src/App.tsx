@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import HeatMap from "./pages/HeatMap";
 import CompanyProfile from "./pages/CompanyProfile";
 import Comparison from "./pages/Comparison";
+import Favorites from "./pages/Favorites";
+import SavedComparisons from "./pages/SavedComparisons";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -18,6 +20,8 @@ function Router() {
       <Route path={"/browse"} component={HeatMap} />
       <Route path={"/company/:id"} component={CompanyProfile} />
       <Route path={"/compare"} component={Comparison} />
+      <Route path={"/favorites"} component={Favorites} />
+      <Route path={"/saved-comparisons"} component={SavedComparisons} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

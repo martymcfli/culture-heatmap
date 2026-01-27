@@ -54,6 +54,113 @@ export const appRouter = router({
       }),
   }),
 
+  jobs: router({
+    getByCompany: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getJobOpenings } = await import('./db');
+        return getJobOpenings(input);
+      }),
+  }),
+
+  news: router({
+    getByCompany: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getCompanyNews } = await import('./db');
+        return getCompanyNews(input, 10);
+      }),
+
+    getByIndustry: publicProcedure
+      .input(z.string())
+      .query(async ({ input }) => {
+        const { getIndustryNews } = await import('./db');
+        return getIndustryNews(input, 10);
+      }),
+  }),
+
+  favorites: router({
+    list: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return [];
+      const { getUserFavorites } = await import('./db');
+      return getUserFavorites(ctx.user.id);
+    }),
+
+    add: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error('Not authenticated');
+        const { addFavorite } = await import('./db');
+        return addFavorite(ctx.user.id, input);
+      }),
+
+    remove: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error('Not authenticated');
+        const { removeFavorite } = await import('./db');
+        return removeFavorite(ctx.user.id, input);
+      }),
+
+    check: publicProcedure
+      .input(z.number())
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user) return false;
+        const { isFavorite } = await import('./db');
+        return isFavorite(ctx.user.id, input);
+      }),
+  }),
+
+  comparisons: router({
+    list: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return [];
+      const { getSavedComparisons } = await import('./db');
+      return getSavedComparisons(ctx.user.id);
+    }),
+
+    save: publicProcedure
+      .input(z.object({
+        comparisonName: z.string(),
+        companyIds: z.array(z.number()),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error('Not authenticated');
+        const { saveComparison } = await import('./db');
+        return saveComparison({
+          userId: ctx.user.id,
+          comparisonName: input.comparisonName,
+          companyIds: JSON.stringify(input.companyIds),
+          notes: input.notes,
+        });
+      }),
+
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        comparisonName: z.string().optional(),
+        companyIds: z.array(z.number()).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error('Not authenticated');
+        const { updateComparison } = await import('./db');
+        return updateComparison(input.id, {
+          comparisonName: input.comparisonName,
+          companyIds: input.companyIds ? JSON.stringify(input.companyIds) : undefined,
+          notes: input.notes,
+        });
+      }),
+
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error('Not authenticated');
+        const { deleteComparison } = await import('./db');
+        return deleteComparison(input);
+      }),
+  }),
+
   reviews: router({
     submit: publicProcedure
       .input(z.object({

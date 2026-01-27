@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -8,6 +9,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import IndustrySections from "@/components/IndustrySections";
 
 const INDUSTRIES = ["Technology", "Finance", "Biotech", "Healthcare Tech", "Cloud Computing", "Automotive"];
 const SIZE_RANGES = ["1-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
@@ -88,18 +90,10 @@ export default function HeatMap() {
               </div>
 
               <div className="space-y-2">
-                <Label>Industry</Label>
-                <Select value={filters.industry} onValueChange={(value) => setFilters({ ...filters, industry: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All Industries</SelectItem>
-                    {INDUSTRIES.map(ind => (
-                      <SelectItem key={ind} value={ind}>{ind}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <IndustrySections
+                  selectedIndustry={filters.industry}
+                  onSelectIndustry={(industry) => setFilters({ ...filters, industry })}
+                />
               </div>
 
               <div className="space-y-2">

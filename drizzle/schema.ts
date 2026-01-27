@@ -137,3 +137,67 @@ export const anonymousReviews = mysqlTable("anonymousReviews", {
 
 export type AnonymousReview = typeof anonymousReviews.$inferSelect;
 export type InsertAnonymousReview = typeof anonymousReviews.$inferInsert;
+
+// Job openings table
+export const jobOpenings = mysqlTable("jobOpenings", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  jobTitle: varchar("jobTitle", { length: 255 }).notNull(),
+  jobDescription: text("jobDescription"),
+  location: varchar("location", { length: 255 }),
+  jobType: varchar("jobType", { length: 50 }),
+  salaryMin: int("salaryMin"),
+  salaryMax: int("salaryMax"),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  postedDate: date("postedDate"),
+  externalUrl: text("externalUrl"),
+  source: varchar("source", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type JobOpening = typeof jobOpenings.$inferSelect;
+export type InsertJobOpening = typeof jobOpenings.$inferInsert;
+
+// Company news table
+export const companyNews = mysqlTable("companyNews", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId"),
+  industryCategory: varchar("industryCategory", { length: 100 }),
+  headline: varchar("headline", { length: 500 }).notNull(),
+  summary: text("summary"),
+  fullContent: text("fullContent"),
+  sourceUrl: text("sourceUrl"),
+  sourceName: varchar("sourceName", { length: 255 }),
+  publishedDate: date("publishedDate"),
+  sentiment: varchar("sentiment", { length: 20 }),
+  relevanceScore: decimal("relevanceScore", { precision: 3, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CompanyNews = typeof companyNews.$inferSelect;
+export type InsertCompanyNews = typeof companyNews.$inferInsert;
+
+// User favorites table
+export const userFavorites = mysqlTable("userFavorites", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  companyId: int("companyId").notNull(),
+  savedAt: timestamp("savedAt").defaultNow().notNull(),
+});
+
+export type UserFavorite = typeof userFavorites.$inferSelect;
+export type InsertUserFavorite = typeof userFavorites.$inferInsert;
+
+// Saved comparisons table
+export const savedComparisons = mysqlTable("savedComparisons", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  comparisonName: varchar("comparisonName", { length: 255 }).notNull(),
+  companyIds: text("companyIds"),
+  notes: text("notes"),
+  savedAt: timestamp("savedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SavedComparison = typeof savedComparisons.$inferSelect;
+export type InsertSavedComparison = typeof savedComparisons.$inferInsert;
