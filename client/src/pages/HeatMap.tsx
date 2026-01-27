@@ -36,11 +36,11 @@ export default function HeatMap() {
   };
 
   const getScoreBgColor = (score: number | null | undefined) => {
-    if (!score) return "bg-gray-100 text-gray-700";
-    if (score >= 4.5) return "bg-green-100 text-green-700";
-    if (score >= 4.0) return "bg-blue-100 text-blue-700";
-    if (score >= 3.5) return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
+    if (!score) return "bg-white/10 text-foreground/60";
+    if (score >= 4.5) return "bg-green-500/20 text-green-300";
+    if (score >= 4.0) return "bg-blue-500/20 text-blue-300";
+    if (score >= 3.5) return "bg-yellow-500/20 text-yellow-300";
+    return "bg-red-500/20 text-red-300";
   };
 
   const chartData = (companies as any[])?.map((c: any) => ({
@@ -52,25 +52,27 @@ export default function HeatMap() {
   })) || [];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="border-b bg-white">
+      <div className="border-b border-white/5 backdrop-blur-md bg-background/40">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link href="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-foreground hover:text-blue-400">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Culture Heat Map</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Culture Heat Map
+          </h1>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
         {/* Filters */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white/5 border-white/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
-            <CardDescription>Customize your search to find companies that match your criteria</CardDescription>
+            <CardTitle className="text-foreground">Filters</CardTitle>
+            <CardDescription className="text-foreground/60">Customize your search to find companies that match your criteria</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

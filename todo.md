@@ -112,3 +112,16 @@
 - [x] Update HeatMap page with industry sections
 - [x] Update Home page with industry categories
 - [x] Test industry filtering and display
+
+
+## Dark Modern Theme & Design Update
+- [ ] Update global CSS with dark color palette
+- [ ] Configure Tailwind for dark mode
+- [ ] Add network visualization background to Home page
+- [ ] Create floating action buttons component
+- [ ] Add smooth animations and transitions
+- [ ] Update all pages with dark theme
+- [ ] Update card and component styling for dark mode
+- [ ] Add gradient overlays and glow effects
+- [ ] Test responsive design with new theme
+- [ ] Verify accessibility with dark theme
