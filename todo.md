@@ -131,3 +131,14 @@
 - [x] Fix browse tab navigation not working
 - [x] Fix heatmap tab navigation not working
 - [x] Adjust background opacity for better content visibility
+
+
+## Current Work - Phase 2
+- [x] Fix browse tab routing (currently not navigating)
+- [x] Apply dark theme to CompanyProfile page
+- [x] Apply dark theme to Comparison page
+- [x] Apply dark theme to Favorites page
+- [x] Implement page transitions with Framer Motion
+- [x] Add search bar with autocomplete suggestions
+- [x] Add recent search history feature
+- [x] Test all navigation and search functionality

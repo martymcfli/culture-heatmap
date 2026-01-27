@@ -13,8 +13,8 @@ export default function Favorites() {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function Favorites() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/">
@@ -45,8 +45,8 @@ export default function Favorites() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">My Favorites</h1>
-            <p className="text-slate-600 mt-1">Companies you've saved for later</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">My Favorites</h1>
+            <p className="text-foreground/60 mt-1">Companies you've saved for later</p>
           </div>
         </div>
 

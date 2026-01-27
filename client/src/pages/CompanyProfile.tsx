@@ -18,26 +18,26 @@ export default function CompanyProfile() {
     enabled: !!companyId,
   });
 
-  if (!companyId) {
+    if (!companyId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-600">Invalid company ID</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-foreground/60">Invalid company ID</p>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
       </div>
     );
   }
 
   if (!companyData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-600">Company not found</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-foreground/60">Company not found</p>
       </div>
     );
   }
@@ -66,11 +66,11 @@ export default function CompanyProfile() {
 
   const getScoreBgColor = (score: number | string) => {
     const numScore = typeof score === "string" ? parseFloat(score) : score;
-    if (isNaN(numScore)) return "bg-gray-100 text-gray-700";
-    if (numScore >= 4.5) return "bg-green-100 text-green-700";
-    if (numScore >= 4.0) return "bg-blue-100 text-blue-700";
-    if (numScore >= 3.5) return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
+    if (isNaN(numScore)) return "bg-white/10 text-foreground/60";
+    if (numScore >= 4.5) return "bg-green-500/20 text-green-300";
+    if (numScore >= 4.0) return "bg-blue-500/20 text-blue-300";
+    if (numScore >= 3.5) return "bg-yellow-500/20 text-yellow-300";
+    return "bg-red-500/20 text-red-300";
   };
 
   const trendData = trends
@@ -82,34 +82,36 @@ export default function CompanyProfile() {
     }));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="border-b bg-white">
+      <div className="border-b border-white/5 backdrop-blur-md bg-background/40">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link href="/heatmap">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-foreground hover:text-blue-400">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Company Profile</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Company Profile
+          </h1>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
         {/* Company Header */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white/5 border-white/10 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-4xl font-bold text-slate-900 mb-2">{company.name}</h2>
-                <div className="space-y-1 text-slate-600">
+                <h2 className="text-4xl font-bold text-foreground mb-2">{company.name}</h2>
+                <div className="space-y-1 text-foreground/60">
                   <p>{company.industry}</p>
                   <p>{company.headquartersCity}, {company.headquartersState}, {company.headquartersCountry}</p>
                   <p>Company Size: {company.sizeRange}</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-slate-600 mb-2">Overall Rating</div>
+                <div className="text-sm text-foreground/60 mb-2">Overall Rating</div>
                 <div className={`text-5xl font-bold ${getScoreBgColor(avgScore("overallRating"))}`}>
                   {avgScore("overallRating")}
                 </div>
@@ -119,10 +121,10 @@ export default function CompanyProfile() {
         </Card>
 
         {/* Radar Chart */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white/5 border-white/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Culture Score Breakdown</CardTitle>
-            <CardDescription>Aggregated metrics from multiple sources</CardDescription>
+            <CardTitle className="text-foreground">Culture Score Breakdown</CardTitle>
+            <CardDescription className="text-foreground/60">Aggregated metrics from multiple sources</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

@@ -31,33 +31,35 @@ export default function Comparison() {
   };
 
   const getScoreBgColor = (score: number | null | undefined) => {
-    if (!score) return "bg-gray-100 text-gray-700";
-    if (score >= 4.5) return "bg-green-100 text-green-700";
-    if (score >= 4.0) return "bg-blue-100 text-blue-700";
-    if (score >= 3.5) return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
+    if (!score) return "bg-white/10 text-foreground/60";
+    if (score >= 4.5) return "bg-green-500/20 text-green-300";
+    if (score >= 4.0) return "bg-blue-500/20 text-blue-300";
+    if (score >= 3.5) return "bg-yellow-500/20 text-yellow-300";
+    return "bg-red-500/20 text-red-300";
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="border-b bg-white">
+      <div className="border-b border-white/5 backdrop-blur-md bg-background/40">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link href="/heatmap">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-foreground hover:text-blue-400">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Compare Companies</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Compare Companies
+          </h1>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
         {/* Search and Selection */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white/5 border-white/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Select Companies to Compare</CardTitle>
-            <CardDescription>Choose up to 4 companies to compare side-by-side</CardDescription>
+            <CardTitle className="text-foreground">Select Companies to Compare</CardTitle>
+            <CardDescription className="text-foreground/60">Choose up to 4 companies to compare side-by-side</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import IndustrySections from "@/components/IndustrySections";
+import SearchBar from "@/components/SearchBar";
 
 const INDUSTRIES = ["Technology", "Finance", "Biotech", "Healthcare Tech", "Cloud Computing", "Automotive"];
 const SIZE_RANGES = ["1-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
@@ -68,6 +69,11 @@ export default function HeatMap() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Search Bar */}
+        <div className="mb-8 flex justify-center">
+          <SearchBar />
+        </div>
+
         {/* Filters */}
         <Card className="mb-8 bg-white/5 border-white/10 backdrop-blur-sm">
           <CardHeader>
