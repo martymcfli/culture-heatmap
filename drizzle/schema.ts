@@ -222,3 +222,46 @@ export const salaryData = mysqlTable("salaryData", {
 
 export type SalaryData = typeof salaryData.$inferSelect;
 export type InsertSalaryData = typeof salaryData.$inferInsert;
+
+
+// Glassdoor interview data table
+export const interviewData = mysqlTable("interviewData", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  glassdoorInterviewId: varchar("glassdoorInterviewId", { length: 255 }).unique(),
+  jobTitle: varchar("jobTitle", { length: 255 }).notNull(),
+  interviewType: varchar("interviewType", { length: 100 }),
+  difficulty: varchar("difficulty", { length: 50 }),
+  duration: varchar("duration", { length: 100 }),
+  questions: text("questions"), // JSON array stored as text
+  experience: text("experience"),
+  outcome: varchar("outcome", { length: 50 }),
+  interviewDate: date("interviewDate"),
+  dataSource: varchar("dataSource", { length: 100 }).default("Glassdoor"),
+  cachedAt: timestamp("cachedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InterviewData = typeof interviewData.$inferSelect;
+export type InsertInterviewData = typeof interviewData.$inferInsert;
+
+// Glassdoor company metrics cache
+export const glassdoorMetrics = mysqlTable("glassdoorMetrics", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull().unique(),
+  companyName: varchar("companyName", { length: 255 }).notNull(),
+  overallRating: decimal("overallRating", { precision: 3, scale: 1 }),
+  ceoApproval: decimal("ceoApproval", { precision: 5, scale: 2 }),
+  recommendToFriend: decimal("recommendToFriend", { precision: 5, scale: 2 }),
+  salaryMin: int("salaryMin"),
+  salaryMax: int("salaryMax"),
+  salaryCurrency: varchar("salaryCurrency", { length: 10 }).default("USD"),
+  reviewCount: int("reviewCount").default(0),
+  interviewCount: int("interviewCount").default(0),
+  lastSyncedAt: timestamp("lastSyncedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GlassdoorMetrics = typeof glassdoorMetrics.$inferSelect;
+export type InsertGlassdoorMetrics = typeof glassdoorMetrics.$inferInsert;

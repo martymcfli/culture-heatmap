@@ -313,7 +313,7 @@ export default function CompanyProfile() {
 
         {/* Job Openings */}
         <div className="mb-8">
-          <JobOpenings companyId={company.id} />
+          <JobOpenings companyId={company.id} companyName={company.name} />
         </div>
 
         {/* Company News */}

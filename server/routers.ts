@@ -250,6 +250,83 @@ export const appRouter = router({
         return getUniqueLevels();
       }),
   }),
+
+  glassdoor: router({
+    getCompanyInterviews: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getCompanyInterviews } = await import('./db');
+        return getCompanyInterviews(input, 20);
+      }),
+
+    getInterviewsByJobTitle: publicProcedure
+      .input(z.object({
+        companyId: z.number(),
+        jobTitle: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getInterviewsByJobTitle } = await import('./db');
+        return getInterviewsByJobTitle(input.companyId, input.jobTitle, 10);
+      }),
+
+    getMetrics: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getGlassdoorMetrics } = await import('./db');
+        return getGlassdoorMetrics(input);
+      }),
+
+    fetchAndCache: publicProcedure
+      .input(z.object({
+        companyId: z.number(),
+        companyName: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { fetchGlassdoorCompanyInterviews, fetchGlassdoorCompanyData } = await import('./glassdoor-service');
+        const { addInterviewData, upsertGlassdoorMetrics } = await import('./db');
+
+        try {
+          // Fetch interviews
+          const interviews = await fetchGlassdoorCompanyInterviews(input.companyName);
+          for (const interview of interviews) {
+            await addInterviewData({
+              companyId: input.companyId,
+              glassdoorInterviewId: interview.id,
+              jobTitle: interview.jobTitle,
+              interviewType: interview.interviewType,
+              difficulty: interview.difficulty,
+              duration: interview.duration,
+              questions: JSON.stringify(interview.questions),
+              experience: interview.experience,
+              outcome: interview.outcome,
+              interviewDate: interview.interviewDate ? new Date(interview.interviewDate) : undefined,
+            });
+          }
+
+          // Fetch company metrics
+          const companyData = await fetchGlassdoorCompanyData(input.companyName);
+          if (companyData) {
+            await upsertGlassdoorMetrics({
+              companyId: input.companyId,
+              companyName: input.companyName,
+              overallRating: companyData.overallRating ? companyData.overallRating.toString() : undefined,
+              ceoApproval: companyData.ceoApproval ? companyData.ceoApproval.toString() : undefined,
+              recommendToFriend: companyData.recommendToFriend ? companyData.recommendToFriend.toString() : undefined,
+              salaryMin: companyData.salaryEstimate?.min,
+              salaryMax: companyData.salaryEstimate?.max,
+              salaryCurrency: companyData.salaryEstimate?.currency,
+              interviewCount: interviews.length,
+              lastSyncedAt: new Date(),
+            });
+          }
+
+          return { success: true, interviewsCount: interviews.length };
+        } catch (error) {
+          console.error('[Glassdoor] Error fetching and caching data:', error);
+          return { success: false, error: 'Failed to fetch Glassdoor data' };
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

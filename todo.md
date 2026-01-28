@@ -161,3 +161,16 @@
 - [x] Update all references from 50+ to 100+ companies
 - [x] Verify all company data is properly seeded (104 total companies)
 - [x] Test filtering and search with expanded dataset
+
+
+## Glassdoor Real-Time API Integration
+- [ ] Request and store Glassdoor API credentials (X-RapidAPI-Key)
+- [ ] Create Glassdoor API service for fetching interview details
+- [ ] Add interviewData table to store interview information
+- [ ] Create backend procedures for fetching Glassdoor interview data
+- [ ] Implement caching to reduce API calls
+- [ ] Update JobOpenings component with real Glassdoor data
+- [ ] Display interview questions and company insights
+- [ ] Add salary data from Glassdoor API
+- [ ] Test API integration and error handling
+- [ ] Verify data accuracy and freshness

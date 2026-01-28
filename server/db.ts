@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview, jobOpenings, InsertJobOpening, companyNews, InsertCompanyNews, userFavorites, InsertUserFavorite, savedComparisons, InsertSavedComparison, salaryData, SalaryData } from "../drizzle/schema";
+import { InsertUser, users, companies, cultureScores, cultureTrends, layoffEvents, anonymousReviews, InsertAnonymousReview, jobOpenings, InsertJobOpening, companyNews, InsertCompanyNews, userFavorites, InsertUserFavorite, savedComparisons, InsertSavedComparison, salaryData, SalaryData, interviewData, InsertInterviewData, glassdoorMetrics, InsertGlassdoorMetrics } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -521,3 +521,89 @@ export async function getUniqueLevels() {
 }
 
 // TODO: add feature queries here as your schema grows.
+
+
+// Glassdoor Interview Data queries
+export async function addInterviewData(interview: InsertInterviewData) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(interviewData).values(interview);
+}
+
+export async function getCompanyInterviews(companyId: number, limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(interviewData)
+    .where(eq(interviewData.companyId, companyId))
+    .orderBy(desc(interviewData.createdAt))
+    .limit(limit);
+}
+
+export async function getInterviewsByJobTitle(companyId: number, jobTitle: string, limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(interviewData)
+    .where(eq(interviewData.companyId, companyId) && eq(interviewData.jobTitle, jobTitle))
+    .orderBy(desc(interviewData.createdAt))
+    .limit(limit);
+}
+
+// Glassdoor Metrics queries
+export async function upsertGlassdoorMetrics(metrics: InsertGlassdoorMetrics) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const existing = await db.select()
+    .from(glassdoorMetrics)
+    .where(eq(glassdoorMetrics.companyId, metrics.companyId))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    return db.update(glassdoorMetrics)
+      .set({
+        ...metrics,
+        updatedAt: new Date(),
+      })
+      .where(eq(glassdoorMetrics.companyId, metrics.companyId));
+  } else {
+    return db.insert(glassdoorMetrics).values(metrics);
+  }
+}
+
+export async function getGlassdoorMetrics(companyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(glassdoorMetrics)
+    .where(eq(glassdoorMetrics.companyId, companyId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getGlassdoorMetricsByName(companyName: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(glassdoorMetrics)
+    .where(eq(glassdoorMetrics.companyName, companyName))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateGlassdoorMetricsSync(companyId: number, syncTime: Date) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(glassdoorMetrics)
+    .set({ lastSyncedAt: syncTime })
+    .where(eq(glassdoorMetrics.companyId, companyId));
+}
