@@ -217,7 +217,7 @@ export default function Home() {
         <section className="container mx-auto px-4 py-20">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
-              { label: "Companies", value: "50+" },
+              { label: "Companies", value: "100+ (More coming soon)" },
               { label: "Reviews", value: "10K+" },
               { label: "Data Sources", value: "3" },
               { label: "Active Users", value: "1K+" },
