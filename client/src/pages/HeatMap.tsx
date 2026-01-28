@@ -89,7 +89,7 @@ export default function HeatMap() {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Locations</SelectItem>
+                    <SelectItem value="all">All Locations</SelectItem>
                     {LOCATIONS.map(loc => (
                       <SelectItem key={loc} value={loc}>{loc}</SelectItem>
                     ))}
@@ -111,7 +111,7 @@ export default function HeatMap() {
                     <SelectValue placeholder="Select size" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Sizes</SelectItem>
+                    <SelectItem value="all">All Sizes</SelectItem>
                     {SIZE_RANGES.map(size => (
                       <SelectItem key={size} value={size}>{size}</SelectItem>
                     ))}
