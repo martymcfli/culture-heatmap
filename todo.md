@@ -192,3 +192,15 @@
 - [x] Add color legend showing score ratings
 - [x] Add glow effects and hover animations
 - [x] Improve chart height and spacing
+
+## Comparison & Recommendation Features (NEW)
+- [x] Build comparison data fetching (culture, salary, jobs, news)
+- [x] Create comparison helpers for multiple companies
+- [x] Implement AI-powered recommendations using OpenAI
+- [x] Build similar companies recommendation logic
+- [x] Integrate financial data support (Finnhub)
+- [x] Create tRPC procedures for recommendations
+- [x] Create tRPC procedures for comparison data
+- [x] Write and pass 7 vitest tests for new features
+- [ ] Create frontend UI for comparison page
+- [ ] Create frontend UI for recommendations sidebar

@@ -251,6 +251,61 @@ export const appRouter = router({
       }),
   }),
 
+  recommendations: router({
+    getAIRecommendations: publicProcedure
+      .input(z.object({
+        preferredIndustry: z.string().optional(),
+        preferredLocation: z.string().optional(),
+        preferredSize: z.string().optional(),
+        minCultureScore: z.number().optional(),
+        maxCultureScore: z.number().optional(),
+        priorities: z.array(z.string()).optional(),
+        excludeCompanyIds: z.array(z.number()).optional(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAIRecommendations } = await import('./recommendation-service');
+        return getAIRecommendations(input, input.limit || 5);
+      }),
+
+    getSimilarCompanies: publicProcedure
+      .input(z.object({
+        companyId: z.number(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAISimilarCompanies } = await import('./recommendation-service');
+        return getAISimilarCompanies(input.companyId, input.limit || 5);
+      }),
+  }),
+
+  comparison: router({
+    getComparisonData: publicProcedure
+      .input(z.array(z.number()))
+      .query(async ({ input }) => {
+        const { getComparisonData } = await import('./comparison-helpers');
+        return getComparisonData(input);
+      }),
+
+    getMetricsSummary: publicProcedure
+      .input(z.array(z.number()))
+      .query(async ({ input }) => {
+        const { getCompanyMetricsSummary } = await import('./comparison-helpers');
+        return getCompanyMetricsSummary(input);
+      }),
+
+    getSalaryComparison: publicProcedure
+      .input(z.object({
+        companyIds: z.array(z.number()),
+        jobTitle: z.string(),
+        level: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getSalaryComparisonForRole } = await import('./comparison-helpers');
+        return getSalaryComparisonForRole(input.companyIds, input.jobTitle, input.level);
+      }),
+  }),
+
   glassdoor: router({
     getCompanyInterviews: publicProcedure
       .input(z.number())
