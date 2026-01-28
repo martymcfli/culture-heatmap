@@ -181,3 +181,14 @@
 - [x] Verify API data fetching
 - [x] Fix heat map visualization (removed empty SelectItem values)
 - [x] Test heat map functionality
+
+## Heat Map Visualization Issues (Current)
+- [x] Fix getFilteredCompanies to include aggregate scores in results
+- [x] Improve scatter chart styling and visibility
+- [x] Add better data visualization (bubble size, colors)
+- [x] Fix empty chart when filters are applied
+- [x] Add company data labels to bubbles (via custom tooltip)
+- [x] Improve responsive design for heat map
+- [x] Add color legend showing score ratings
+- [x] Add glow effects and hover animations
+- [x] Improve chart height and spacing

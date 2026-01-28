@@ -5,16 +5,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import IndustrySections from "@/components/IndustrySections";
 import SearchBar from "@/components/SearchBar";
 
 const INDUSTRIES = ["Technology", "Finance", "Biotech", "Healthcare Tech", "Cloud Computing", "Automotive"];
 const SIZE_RANGES = ["1-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
 const LOCATIONS = ["San Antonio, TX", "New York, NY", "Cupertino, CA", "Seattle, WA", "Boston, MA"];
+
+// Get color based on overall rating score
+const getColorByScore = (score: number | null | undefined) => {
+  if (!score) return "#64748b";
+  if (score >= 4.7) return "#10b981"; // Emerald - Excellent
+  if (score >= 4.4) return "#06b6d4"; // Cyan - Very Good
+  if (score >= 4.1) return "#3b82f6"; // Blue - Good
+  if (score >= 3.8) return "#f59e0b"; // Amber - Fair
+  if (score >= 3.5) return "#f97316"; // Orange - Below Average
+  return "#ef4444"; // Red - Poor
+};
+
+const getScoreLabel = (score: number | null | undefined) => {
+  if (!score) return "No Data";
+  if (score >= 4.7) return "Excellent";
+  if (score >= 4.4) return "Very Good";
+  if (score >= 4.1) return "Good";
+  if (score >= 3.8) return "Fair";
+  if (score >= 3.5) return "Below Average";
+  return "Poor";
+};
 
 export default function HeatMap() {
   const [filters, setFilters] = useState({
@@ -26,31 +47,43 @@ export default function HeatMap() {
   });
 
   const [viewMode, setViewMode] = useState<"heatmap" | "list">("heatmap");
+  const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
   const { data: companies, isLoading } = trpc.companies.filter.useQuery(filters);
-
-  const getScoreColor = (score: number | null | undefined) => {
-    if (!score) return "#e5e7eb";
-    if (score >= 4.5) return "#22c55e";
-    if (score >= 4.0) return "#3b82f6";
-    if (score >= 3.5) return "#eab308";
-    return "#ef4444";
-  };
-
-  const getScoreBgColor = (score: number | null | undefined) => {
-    if (!score) return "bg-white/10 text-foreground/60";
-    if (score >= 4.5) return "bg-green-500/20 text-green-300";
-    if (score >= 4.0) return "bg-blue-500/20 text-blue-300";
-    if (score >= 3.5) return "bg-yellow-500/20 text-yellow-300";
-    return "bg-red-500/20 text-red-300";
-  };
 
   const chartData = (companies as any[])?.map((c: any) => ({
     name: c.name,
     id: c.id,
+    industry: c.industry,
+    size: c.sizeRange,
     workLifeBalance: parseFloat(String(c.aggregateScore?.workLifeBalance || 0)),
     overallRating: parseFloat(String(c.aggregateScore?.overallRating || 0)),
     compensationBenefits: parseFloat(String(c.aggregateScore?.compensationBenefits || 0)),
+    color: getColorByScore(parseFloat(String(c.aggregateScore?.overallRating || 0))),
   })) || [];
+
+  const CustomTooltip = (props: any) => {
+    const { active, payload } = props;
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-slate-900/95 border border-cyan-500/50 rounded-lg p-3 shadow-xl">
+          <p className="font-bold text-cyan-300">{data.name}</p>
+          <p className="text-sm text-gray-300">{data.industry}</p>
+          <p className="text-sm text-gray-400 mt-2">
+            Overall Rating: <span className="font-semibold text-white">{data.overallRating.toFixed(2)}</span>
+          </p>
+          <p className="text-sm text-gray-400">
+            Work-Life Balance: <span className="font-semibold text-white">{data.workLifeBalance.toFixed(2)}</span>
+          </p>
+          <p className="text-sm text-gray-400">
+            Compensation: <span className="font-semibold text-white">{data.compensationBenefits.toFixed(2)}</span>
+          </p>
+          <p className="text-xs text-cyan-400 mt-2">Click to view full profile</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -62,9 +95,12 @@ export default function HeatMap() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Culture Heat Map
-          </h1>
+          <div className="flex items-center gap-2">
+            <Zap className="w-6 h-6 text-cyan-400" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Culture Heat Map
+            </h1>
+          </div>
         </div>
       </div>
 
@@ -152,12 +188,14 @@ export default function HeatMap() {
           <Button
             variant={viewMode === "heatmap" ? "default" : "outline"}
             onClick={() => setViewMode("heatmap")}
+            className={viewMode === "heatmap" ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600" : ""}
           >
             Heat Map View
           </Button>
           <Button
             variant={viewMode === "list" ? "default" : "outline"}
             onClick={() => setViewMode("list")}
+            className={viewMode === "list" ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600" : ""}
           >
             List View
           </Button>
@@ -166,62 +204,162 @@ export default function HeatMap() {
         {/* Content */}
         {isLoading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
           </div>
         ) : viewMode === "heatmap" ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Work-Life Balance vs Overall Rating</CardTitle>
-              <CardDescription>
-                Each bubble represents a company. Size and color indicate culture scores.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="overallRating" name="Overall Rating" />
-                  <YAxis dataKey="workLifeBalance" name="Work-Life Balance" />
-                  <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-                  <Legend />
-                  <Scatter
-                    name="Companies"
+          <>
+            {/* Color Legend */}
+            <Card className="mb-6 bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+                  {[
+                    { score: 4.7, label: "Excellent", color: "#10b981" },
+                    { score: 4.4, label: "Very Good", color: "#06b6d4" },
+                    { score: 4.1, label: "Good", color: "#3b82f6" },
+                    { score: 3.8, label: "Fair", color: "#f59e0b" },
+                    { score: 3.5, label: "Below Avg", color: "#f97316" },
+                    { score: 3.0, label: "Poor", color: "#ef4444" },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded-full shadow-lg" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-sm text-foreground/70">{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Heat Map Chart */}
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-foreground">Work-Life Balance vs Overall Rating</CardTitle>
+                <CardDescription className="text-foreground/60">
+                  Bubble color represents overall company rating. Hover over bubbles for details.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={600}>
+                  <ScatterChart 
+                    margin={{ top: 20, right: 20, bottom: 80, left: 80 }} 
                     data={chartData}
-                    fill="#3b82f6"
-                    onClick={(data: any) => {
-                      if (data && data.id) {
-                        window.location.href = `/company/${data.id}`;
-                      }
-                    }}
-                  />
-                </ScatterChart>
-              </ResponsiveContainer>
-              <p className="text-sm text-slate-600 mt-4">Click on any bubble to view detailed company information</p>
-            </CardContent>
-          </Card>
+                  >
+                    <CartesianGrid 
+                      strokeDasharray="3 3" 
+                      stroke="rgba(255,255,255,0.1)" 
+                      vertical={true}
+                      horizontal={true}
+                    />
+                    <XAxis 
+                      dataKey="overallRating" 
+                      name="Overall Rating" 
+                      type="number"
+                      domain={[0, 5]}
+                      label={{ 
+                        value: 'Overall Company Rating', 
+                        position: 'insideBottomRight', 
+                        offset: -10,
+                        fill: '#9ca3af',
+                        fontSize: 14,
+                        fontWeight: 600
+                      }}
+                      stroke="#6b7280"
+                      tick={{ fill: '#9ca3af' }}
+                    />
+                    <YAxis 
+                      dataKey="workLifeBalance" 
+                      name="Work-Life Balance"
+                      type="number"
+                      domain={[0, 5]}
+                      label={{ 
+                        value: 'Work-Life Balance Score', 
+                        angle: -90, 
+                        position: 'insideLeft',
+                        fill: '#9ca3af',
+                        fontSize: 14,
+                        fontWeight: 600
+                      }}
+                      stroke="#6b7280"
+                      tick={{ fill: '#9ca3af' }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend 
+                      wrapperStyle={{ color: '#9ca3af', paddingTop: '20px' }}
+                      verticalAlign="bottom"
+                      height={36}
+                    />
+                    <Scatter
+                      name="Companies"
+                      data={chartData}
+                      onClick={(data: any) => {
+                        if (data && data.id) {
+                          window.location.href = `/company/${data.id}`;
+                        }
+                      }}
+                      onMouseEnter={(data: any) => setHoveredCompany(data.id)}
+                      onMouseLeave={() => setHoveredCompany(null)}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.color}
+                          fillOpacity={hoveredCompany === entry.id ? 1 : 0.6}
+                          style={{
+                            cursor: 'pointer',
+                            filter: hoveredCompany === entry.id ? 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))' : 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))',
+                            transition: 'all 0.3s ease'
+                          }}
+                        />
+                      ))}
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+                <p className="text-sm text-foreground/60 mt-8 text-center">
+                  ✨ Click on any bubble to view detailed company information
+                </p>
+              </CardContent>
+            </Card>
+          </>
         ) : (
           <div className="space-y-4">
             {(companies as any[])?.map((company: any) => (
               <Link key={company.id} href={`/company/${company.id}`}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card className="hover:shadow-lg transition-all cursor-pointer border-white/10 hover:border-cyan-500/50 bg-white/5 hover:bg-white/10">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-slate-900">{company.name}</h3>
-                        <p className="text-sm text-slate-600">{company.industry} • {company.headquartersCity}, {company.headquartersState}</p>
+                        <h3 className="font-semibold text-lg text-foreground">{company.name}</h3>
+                        <p className="text-sm text-foreground/60">{company.industry} • {company.headquartersCity}, {company.headquartersState}</p>
                       </div>
-                      <div className="flex gap-4 items-center">
+                      <div className="flex gap-6 items-center">
                         {company.aggregateScore && (
                           <>
                             <div className="text-right">
-                              <div className="text-sm text-slate-600">Overall Rating</div>
-                              <div className={`text-2xl font-bold ${getScoreBgColor(company.aggregateScore.overallRating)}`}>
+                              <div className="text-sm text-foreground/60">Overall Rating</div>
+                              <div 
+                                className="text-3xl font-bold rounded-lg px-3 py-1"
+                                style={{
+                                  color: getColorByScore(company.aggregateScore.overallRating),
+                                  textShadow: `0 0 10px ${getColorByScore(company.aggregateScore.overallRating)}40`
+                                }}
+                              >
                                 {company.aggregateScore.overallRating.toFixed(1)}
+                              </div>
+                              <div className="text-xs text-foreground/50 mt-1">
+                                {getScoreLabel(company.aggregateScore.overallRating)}
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-sm text-slate-600">Work-Life Balance</div>
-                              <div className={`text-2xl font-bold ${getScoreBgColor(company.aggregateScore.workLifeBalance)}`}>
+                              <div className="text-sm text-foreground/60">Work-Life</div>
+                              <div 
+                                className="text-3xl font-bold rounded-lg px-3 py-1"
+                                style={{
+                                  color: getColorByScore(company.aggregateScore.workLifeBalance),
+                                  textShadow: `0 0 10px ${getColorByScore(company.aggregateScore.workLifeBalance)}40`
+                                }}
+                              >
                                 {company.aggregateScore.workLifeBalance.toFixed(1)}
                               </div>
                             </div>
@@ -237,10 +375,14 @@ export default function HeatMap() {
         )}
 
         {!isLoading && companies?.length === 0 && (
-          <Card>
+          <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardContent className="pt-12 text-center">
-              <p className="text-slate-600 mb-4">No companies found matching your filters.</p>
-              <Button variant="outline" onClick={() => setFilters({ location: "", industry: "", sizeRange: "", minScore: 0, maxScore: 5 })}>
+              <p className="text-foreground/60 mb-4">No companies found matching your filters.</p>
+              <Button 
+                variant="outline" 
+                onClick={() => setFilters({ location: "", industry: "", sizeRange: "", minScore: 0, maxScore: 5 })}
+                className="hover:bg-cyan-500/20 hover:border-cyan-500"
+              >
                 Reset Filters
               </Button>
             </CardContent>

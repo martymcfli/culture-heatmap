@@ -190,26 +190,23 @@ export async function getFilteredCompanies(filters: {
     results = results.filter(c => c.sizeRange === filters.sizeRange);
   }
   
-  // Filter by score if needed
-  if (filters.minScore !== undefined || filters.maxScore !== undefined) {
-    const filtered = [];
-    for (const company of results) {
-      const aggregate = await getAggregateScore(company.id);
-      if (!aggregate) continue;
-      
-      const score = aggregate.overallRating;
-      if (filters.minScore !== undefined && score < filters.minScore) continue;
-      if (filters.maxScore !== undefined && score > filters.maxScore) continue;
-      
-      filtered.push(company);
-    }
-    results = filtered;
+  // Always fetch aggregate scores for all filtered companies
+  const companiesWithScores = [];
+  for (const company of results) {
+    const aggregate = await getAggregateScore(company.id);
+    if (!aggregate) continue;
+    
+    const score = aggregate.overallRating;
+    if (filters.minScore !== undefined && score < filters.minScore) continue;
+    if (filters.maxScore !== undefined && score > filters.maxScore) continue;
+    
+    companiesWithScores.push({ ...company, aggregateScore: aggregate });
   }
   
   // Apply pagination
   const offset = filters.offset || 0;
   const limit = filters.limit || 100;
-  return results.slice(offset, offset + limit);
+  return companiesWithScores.slice(offset, offset + limit);
 }
 
 export async function getCompaniesWithAggregateScores(limit = 100, offset = 0) {
