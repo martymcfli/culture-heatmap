@@ -48,6 +48,7 @@ export default function HeatMap() {
 
   const [viewMode, setViewMode] = useState<"heatmap" | "list">("heatmap");
   const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
   const { data: companies, isLoading } = trpc.companies.filter.useQuery(filters);
 
   const chartData = (companies as any[])?.map((c: any) => ({
@@ -55,6 +56,7 @@ export default function HeatMap() {
     id: c.id,
     industry: c.industry,
     size: c.sizeRange,
+    logoUrl: c.logoUrl,
     workLifeBalance: parseFloat(String(c.aggregateScore?.workLifeBalance || 0)),
     overallRating: parseFloat(String(c.aggregateScore?.overallRating || 0)),
     compensationBenefits: parseFloat(String(c.aggregateScore?.compensationBenefits || 0)),
@@ -67,6 +69,9 @@ export default function HeatMap() {
       const data = payload[0].payload;
       return (
         <div className="bg-slate-900/95 border border-cyan-500/50 rounded-lg p-3 shadow-xl">
+          {data.logoUrl && (
+            <img src={data.logoUrl} alt={data.name} className="w-10 h-10 rounded mb-2 object-contain" />
+          )}
           <p className="font-bold text-cyan-300">{data.name}</p>
           <p className="text-sm text-gray-300">{data.industry}</p>
           <p className="text-sm text-gray-400 mt-2">

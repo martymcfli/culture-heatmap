@@ -164,7 +164,7 @@ export default function JobSearch() {
                   <SelectValue placeholder="Select job type" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {jobTypeOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -192,7 +192,7 @@ export default function JobSearch() {
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
                   {seniorityOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}

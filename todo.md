@@ -269,3 +269,12 @@
 - [x] Change "Get Started" to "Try Demo (No Sign-Up Required)"
 - [x] Update button to link to /demo instead of login URL
 - [x] Removes friction for first-time visitors
+
+
+## Critical Bugs Fixed
+- [x] Heat map not populating data for authenticated users (added logoUrl to chartData)
+- [x] Jobs tab Select.Item empty value error (changed "" to "all" for All Types/All Levels)
+- [x] Missing company logos in heat map (added logoUrl to tooltip and chartData)
+- [x] Missing chatbot component on pages (ChatBox already imported and rendered in App.tsx)
+- [x] Heat map bubbles now clickable with persistent tooltips (added selectedCompany state)
+- [x] TypeScript compilation successful
