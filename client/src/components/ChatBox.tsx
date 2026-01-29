@@ -128,11 +128,11 @@ export default function ChatBox({ companyContext }: ChatBoxProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all group"
+          className="fixed bottom-6 left-6 z-40 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all group"
           title="Ask OP - AI Assistant"
         >
           <MessageCircle className="w-6 h-6" />
-          <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-slate-900 text-white text-sm rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="absolute bottom-full left-0 mb-2 px-3 py-1 bg-slate-900 text-white text-sm rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
             Ask OP
           </span>
         </button>
@@ -140,7 +140,7 @@ export default function ChatBox({ companyContext }: ChatBoxProps) {
 
       {/* Chat Panel */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-slate-900 border-slate-700 flex flex-col shadow-2xl">
+        <Card className="fixed bottom-6 left-6 z-50 w-96 h-[600px] bg-slate-900 border-slate-700 flex flex-col shadow-2xl">
           {/* Header */}
           <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-4 flex items-center justify-between rounded-t-lg">
             <div>

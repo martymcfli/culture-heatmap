@@ -278,3 +278,7 @@
 - [x] Missing chatbot component on pages (ChatBox already imported and rendered in App.tsx)
 - [x] Heat map bubbles now clickable with persistent tooltips (added selectedCompany state)
 - [x] TypeScript compilation successful
+
+
+## UI Improvements
+- [x] Move chatbot button from right-hand side to left-hand side
