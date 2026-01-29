@@ -1,4 +1,7 @@
 # 🔥 Culture Heat Map
+## Why I Built This
+
+After exiting Trail Blazers in 2023 and living abroad for some time, I started job hunting. Every company I researched meant opening 10+ tabs across Glassdoor, Indeed, and Comparably. I built this tool to aggregate that data in one place and make company comparison instant.
 
 > **Discover Your Ideal Workplace** — Interactive platform to explore and compare company cultures across 100+ leading organizations. Powered by real employee reviews, salary data, and AI-driven insights.
 
