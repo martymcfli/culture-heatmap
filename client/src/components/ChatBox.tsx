@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,8 +34,37 @@ export default function ChatBox({ companyContext }: ChatBoxProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Detect if user is asking to compare companies
+  const detectComparison = (text: string): { companies: string[]; isComparison: boolean } => {
+    const lowerText = text.toLowerCase();
+    const comparisonPatterns = [
+      /compare\s+([a-z0-9\s&]+?)\s+(?:and|vs|with|to)\s+([a-z0-9\s&]+?)(?:\?|$)/i,
+      /([a-z0-9\s&]+?)\s+vs\s+([a-z0-9\s&]+?)(?:\?|$)/i,
+      /what's\s+the\s+difference\s+between\s+([a-z0-9\s&]+?)\s+and\s+([a-z0-9\s&]+?)(?:\?|$)/i,
+    ];
+
+    for (const pattern of comparisonPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        const company1 = match[1]?.trim().replace(/^(the|a)\s+/i, "");
+        const company2 = match[2]?.trim().replace(/^(the|a)\s+/i, "");
+        if (company1 && company2) {
+          return {
+            isComparison: true,
+            companies: [company1, company2],
+          };
+        }
+      }
+    }
+
+    return { isComparison: false, companies: [] };
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
+
+    // Check if user is asking for a comparison
+    const { isComparison, companies } = detectComparison(input);
 
     // Add user message
     const userMessage: Message = { role: "user", content: input };
@@ -44,18 +73,41 @@ export default function ChatBox({ companyContext }: ChatBoxProps) {
     setIsLoading(true);
 
     try {
-      // Call chatbot API
-      const result = await chatMutation.mutateAsync({
-        messages: [...messages, userMessage],
-        companyContext,
-      });
+      // If comparison detected, offer to navigate to comparison page
+      if (isComparison && companies.length === 2) {
+        const [company1, company2] = companies;
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: `I detected you want to compare ${company1} and ${company2}. Let me fetch their data and show you a detailed comparison. I'll also answer any specific questions you have about how they differ.`,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
 
-      // Add assistant response
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: result.response,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+        // Store comparison request for later use
+        sessionStorage.setItem(
+          "pendingComparison",
+          JSON.stringify({ company1, company2 })
+        );
+
+        // Navigate to comparison page after a short delay
+        setTimeout(() => {
+          window.location.href = `/compare?companies=${encodeURIComponent(
+            company1
+          )},${encodeURIComponent(company2)}`;
+        }, 1500);
+      } else {
+        // Regular chat response
+        const result = await chatMutation.mutateAsync({
+          messages: [...messages, userMessage],
+          companyContext,
+        });
+
+        // Add assistant response
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: result.response,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
     } catch (error) {
       console.error("Chat error:", error);
       setMessages((prev) => [
@@ -149,8 +201,8 @@ export default function ChatBox({ companyContext }: ChatBoxProps) {
                   handleSendMessage();
                 }
               }}
-              placeholder="Ask about companies..."
-              className="bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+              placeholder="Ask me anything... e.g. 'compare Google vs Meta' or 'What's the average turnover at Apple?'"
+              className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 text-sm"
               disabled={isLoading}
             />
             <Button

@@ -242,3 +242,10 @@
 - [x] Integrate chat into App.tsx (available on all pages)
 - [x] Add markdown rendering for chat responses (using Streamdown)
 - [x] TypeScript compilation successful
+
+
+## Chatbot Enhancements
+- [x] Update chat placeholder with inspiring examples ("compare Google vs Meta", "What's the average turnover at Apple?")
+- [x] Add company comparison detection logic (regex patterns for compare/vs/difference)
+- [x] Create comparison redirect functionality (navigates to /compare with company params)
+- [x] Test chatbot comparison feature (TypeScript compilation successful)
