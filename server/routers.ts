@@ -450,6 +450,23 @@ export const appRouter = router({
         return getLinkedInJobDetails(input);
       }),
   }),
+
+  chatbot: router({
+    chat: publicProcedure
+      .input(z.object({
+        messages: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string(),
+        })),
+        companyContext: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { chatWithOP } = await import('./chatbot-service');
+        const response = await chatWithOP(input.messages, input.companyContext);
+        return { response };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
+

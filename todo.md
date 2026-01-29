@@ -233,3 +233,12 @@
 - [x] Add logos to company cards in grid view
 - [x] Update legend with descriptions and color meanings
 - [x] Test and verify visual enhancements (TypeScript compilation successful)
+
+
+## AI Chatbot Feature - "Ask OP"
+- [x] Create backend AI chatbot service with OpenAI integration
+- [x] Add tRPC procedure for chat messages with context
+- [x] Build floating chat button and chat UI component
+- [x] Integrate chat into App.tsx (available on all pages)
+- [x] Add markdown rendering for chat responses (using Streamdown)
+- [x] TypeScript compilation successful

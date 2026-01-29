@@ -13,6 +13,7 @@ import SavedComparisons from "./pages/SavedComparisons";
 import SalaryBenchmark from "./pages/SalaryBenchmark";
 import JobSearch from "./pages/JobSearch";
 import DemoHeatMap from "./pages/DemoHeatMap";
+import ChatBox from "./components/ChatBox";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -50,6 +51,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <ChatBox />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
