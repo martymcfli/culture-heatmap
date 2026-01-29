@@ -15,6 +15,48 @@ import { AlertCircle, Zap } from "lucide-react";
 import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
 
+// Custom tooltip component with company logo
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-slate-900/95 border border-cyan-500/50 rounded-lg p-4 shadow-2xl backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-3">
+          {data.logoUrl && (
+            <img
+              src={data.logoUrl}
+              alt={data.name}
+              className="w-10 h-10 object-contain bg-white rounded p-1"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          )}
+          <div>
+            <p className="font-bold text-cyan-300 text-sm">{data.name}</p>
+            <p className="text-xs text-slate-400">{data.industry}</p>
+          </div>
+        </div>
+        <div className="space-y-1 text-xs">
+          <div className="flex justify-between gap-4">
+            <span className="text-slate-400">Overall Rating:</span>
+            <span className="text-cyan-300 font-semibold">{data.x.toFixed(2)}/5</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span className="text-slate-400">Work-Life Balance:</span>
+            <span className="text-cyan-300 font-semibold">{data.y.toFixed(2)}/5</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span className="text-slate-400">Compensation:</span>
+            <span className="text-cyan-300 font-semibold">{data.compensation.toFixed(2)}/5</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function DemoHeatMap() {
   const [selectedIndustry, setSelectedIndustry] = useState<string>("all");
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
@@ -43,6 +85,7 @@ export default function DemoHeatMap() {
       y: company.aggregateScore?.workLifeBalance || 0,
       compensation: company.aggregateScore?.compensationBenefits || 0,
       industry: company.industry,
+      logoUrl: company.logoUrl,
     }));
   }, [filteredCompanies]);
 
@@ -57,16 +100,14 @@ export default function DemoHeatMap() {
     return unique.sort();
   }, [allCompanies]);
 
-  // Color mapping for industries
-  const getIndustryColor = (industry: string) => {
-    const colors: { [key: string]: string } = {
-      Technology: "#06b6d4",
-      Finance: "#3b82f6",
-      Healthcare: "#10b981",
-      Consumer: "#f59e0b",
-      Other: "#8b5cf6",
-    };
-    return colors[industry] || "#6366f1";
+  // Get color based on overall rating with gradient
+  const getColorByRating = (rating: number) => {
+    if (rating >= 4.5) return "#10b981"; // Emerald - Excellent
+    if (rating >= 4.2) return "#06b6d4"; // Cyan - Very Good
+    if (rating >= 3.9) return "#3b82f6"; // Blue - Good
+    if (rating >= 3.6) return "#8b5cf6"; // Purple - Fair
+    if (rating >= 3.3) return "#f59e0b"; // Amber - Below Average
+    return "#ef4444"; // Red - Poor
   };
 
   return (
@@ -94,7 +135,7 @@ export default function DemoHeatMap() {
             Company Culture Heat Map
           </h1>
           <p className="text-slate-400 mt-2">
-            Explore company cultures across industries. Bubble position shows overall rating vs work-life balance.
+            Explore company cultures across industries. Hover over bubbles to see company logos and detailed scores.
           </p>
         </div>
       </div>
@@ -154,6 +195,7 @@ export default function DemoHeatMap() {
         {/* Heat Map Chart */}
         <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 mb-8">
           <h2 className="text-xl font-semibold mb-6 text-cyan-400">Culture Score Distribution</h2>
+          <p className="text-slate-400 text-sm mb-4">Hover over bubbles to see company logos and detailed metrics</p>
 
           {chartData.length > 0 ? (
             <div className="w-full h-96">
@@ -176,27 +218,28 @@ export default function DemoHeatMap() {
                     stroke="#94a3b8"
                     label={{ value: "Work-Life Balance →", angle: -90, position: "insideLeft" }}
                   />
-                  <Tooltip
-                    cursor={{ strokeDasharray: "3 3" }}
-                    contentStyle={{
-                      backgroundColor: "#1e293b",
-                      border: "1px solid #475569",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value: any) => value.toFixed(2)}
-                    labelFormatter={(label: any) => `Rating: ${label.toFixed(2)}`}
-                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: "3 3" }} />
                   <Legend />
-                  {industries.map((industry) => (
-                    <Scatter
-                      key={industry}
-                      name={industry}
-                      data={chartData.filter((d) => d.industry === industry)}
-                      fill={getIndustryColor(industry)}
-                      fillOpacity={0.7}
-                      r={6}
-                    />
-                  ))}
+                  <Scatter
+                    name="Companies"
+                    data={chartData}
+                    fill="#06b6d4"
+                    fillOpacity={0.8}
+                    r={8}
+                    shape="circle"
+                    isAnimationActive={true}
+                    animationDuration={300}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Scatter
+                        key={`scatter-${index}`}
+                        dataKey="y"
+                        fill={getColorByRating(entry.x)}
+                        fillOpacity={0.75}
+                        r={8}
+                      />
+                    ))}
+                  </Scatter>
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
@@ -207,34 +250,32 @@ export default function DemoHeatMap() {
           )}
         </Card>
 
-        {/* Color Legend */}
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 mb-8">
+        {/* Color Legend with Gradient */}
+        <Card className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 border-slate-700/50 backdrop-blur-sm p-6 mb-8">
           <h3 className="text-lg font-semibold text-cyan-400 mb-4">Culture Score Legend</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-green-500"></div>
-              <span className="text-sm text-slate-300">Excellent (4.5-5.0)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-cyan-500"></div>
-              <span className="text-sm text-slate-300">Very Good (4.0-4.5)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-              <span className="text-sm text-slate-300">Good (3.5-4.0)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-amber-500"></div>
-              <span className="text-sm text-slate-300">Fair (3.0-3.5)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-orange-500"></div>
-              <span className="text-sm text-slate-300">Below Avg (2.5-3.0)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500"></div>
-              <span className="text-sm text-slate-300">Poor (&lt;2.5)</span>
-            </div>
+          <div className="space-y-3">
+            {[
+              { color: "#10b981", range: "4.5 - 5.0", label: "Excellent", desc: "Outstanding culture and work environment" },
+              { color: "#06b6d4", range: "4.2 - 4.5", label: "Very Good", desc: "Strong culture with minor areas for improvement" },
+              { color: "#3b82f6", range: "3.9 - 4.2", label: "Good", desc: "Solid culture and employee satisfaction" },
+              { color: "#8b5cf6", range: "3.6 - 3.9", label: "Fair", desc: "Acceptable culture with mixed reviews" },
+              { color: "#f59e0b", range: "3.3 - 3.6", label: "Below Average", desc: "Some concerns about work environment" },
+              { color: "#ef4444", range: "< 3.3", label: "Poor", desc: "Significant culture and satisfaction issues" },
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3">
+                <div
+                  className="w-6 h-6 rounded-full shadow-lg"
+                  style={{ backgroundColor: item.color }}
+                ></div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-white">{item.label}</span>
+                    <span className="text-xs text-slate-400">({item.range})</span>
+                  </div>
+                  <p className="text-xs text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
 
@@ -247,9 +288,23 @@ export default function DemoHeatMap() {
               {filteredCompanies.map((company: any) => (
                 <div
                   key={company.id}
-                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg p-4 hover:border-cyan-500/50 transition-all"
+                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg p-4 hover:border-cyan-500/50 transition-all group"
                 >
-                  <h3 className="font-semibold text-cyan-400 text-lg mb-2">{company.name}</h3>
+                  <div className="flex items-start gap-3 mb-3">
+                    {company.logoUrl && (
+                      <img
+                        src={company.logoUrl}
+                        alt={company.name}
+                        className="w-10 h-10 object-contain bg-white rounded p-1 flex-shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    )}
+                    <h3 className="font-semibold text-cyan-400 text-lg group-hover:text-cyan-300 transition-colors">
+                      {company.name}
+                    </h3>
+                  </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-slate-400">Industry:</span>
@@ -270,7 +325,13 @@ export default function DemoHeatMap() {
                     <div className="border-t border-slate-600/50 pt-2 mt-2">
                       <div className="flex justify-between items-center">
                         <span className="text-slate-400">Overall Rating:</span>
-                        <span className="text-lg font-bold text-cyan-400">
+                        <span
+                          className="text-lg font-bold rounded px-2 py-1"
+                          style={{
+                            color: getColorByRating(company.aggregateScore?.overallRating || 0),
+                            textShadow: `0 0 8px ${getColorByRating(company.aggregateScore?.overallRating || 0)}40`,
+                          }}
+                        >
                           {company.aggregateScore?.overallRating?.toFixed(1) || "N/A"}/5
                         </span>
                       </div>

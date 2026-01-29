@@ -19,6 +19,7 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.5,
       seniorManagement: 4.3,
     },
+    logoUrl: "https://www.gstatic.com/images/branding/product/1x/googleg_40dp.png",
   },
   {
     id: 2,
@@ -34,6 +35,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.5,
       cultureValues: 4.3,
       seniorManagement: 4.2,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/200px-Microsoft_logo.svg.png",
     },
   },
   {
@@ -50,6 +52,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.4,
       cultureValues: 4.2,
       seniorManagement: 4.1,
+    logoUrl: "https://www.apple.com/ac/structured-data/images/open_graph_logo.png",
     },
   },
   {
@@ -66,6 +69,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.2,
       cultureValues: 3.8,
       seniorManagement: 3.7,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/200px-Amazon_logo.svg.png",
     },
   },
   {
@@ -82,6 +86,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.0,
       seniorManagement: 3.9,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc_logo.svg/200px-Meta_Platforms_Inc_logo.svg.png",
     },
   },
   {
@@ -98,6 +103,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.1,
       cultureValues: 3.6,
       seniorManagement: 3.5,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Tesla_logo.png/200px-Tesla_logo.png",
     },
   },
   {
@@ -114,6 +120,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.1,
       seniorManagement: 4.0,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/JPMorgan_Chase_Logo_2008_1.svg/200px-JPMorgan_Chase_Logo_2008_1.svg.png",
     },
   },
   {
@@ -130,6 +137,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.2,
       cultureValues: 3.9,
       seniorManagement: 3.8,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Goldman_Sachs.svg/200px-Goldman_Sachs.svg.png",
     },
   },
   {
@@ -146,6 +154,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.2,
       cultureValues: 4.0,
       seniorManagement: 3.9,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Morgan_Stanley_logo.svg/200px-Morgan_Stanley_logo.svg.png",
     },
   },
   {
@@ -162,6 +171,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.0,
       cultureValues: 3.8,
       seniorManagement: 3.7,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/BofA_logo.svg/200px-BofA_logo.svg.png",
     },
   },
   {
@@ -178,6 +188,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.2,
       cultureValues: 4.2,
       seniorManagement: 4.1,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Pfizer_logo.svg/200px-Pfizer_logo.svg.png",
     },
   },
   {
@@ -194,6 +205,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.3,
       seniorManagement: 4.2,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Johnson_%26_Johnson_logo.svg/200px-Johnson_%26_Johnson_logo.svg.png",
     },
   },
   {
@@ -210,6 +222,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.4,
       cultureValues: 4.1,
       seniorManagement: 4.0,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Moderna_2020_logo.svg/200px-Moderna_2020_logo.svg.png",
     },
   },
   {
@@ -226,6 +239,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.6,
       cultureValues: 4.4,
       seniorManagement: 4.3,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Nvidia_logo.svg/200px-Nvidia_logo.svg.png",
     },
   },
   {
@@ -242,6 +256,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.1,
       cultureValues: 3.9,
       seniorManagement: 3.8,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Intel_logo_%282020%2C_dark_blue%29.svg/200px-Intel_logo_%282020%2C_dark_blue%29.svg.png",
     },
   },
   {
@@ -258,6 +273,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.2,
       seniorManagement: 4.1,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/200px-Salesforce.com_logo.svg.png",
     },
   },
   {
@@ -274,6 +290,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 3.9,
       cultureValues: 3.7,
       seniorManagement: 3.6,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Oracle_logo.svg/200px-Oracle_logo.svg.png",
     },
   },
   {
@@ -290,6 +307,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 3.8,
       cultureValues: 3.6,
       seniorManagement: 3.5,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/200px-IBM_logo.svg.png",
     },
   },
   {
@@ -306,6 +324,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.2,
       cultureValues: 4.0,
       seniorManagement: 3.9,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Accenture.svg/200px-Accenture.svg.png",
     },
   },
   {
@@ -322,6 +341,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.1,
       cultureValues: 3.9,
       seniorManagement: 3.8,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Deloitte_Logo.svg/200px-Deloitte_Logo.svg.png",
     },
   },
   {
@@ -338,6 +358,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.4,
       cultureValues: 4.3,
       seniorManagement: 4.2,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Netflix_logo.svg/200px-Netflix_logo.svg.png",
     },
   },
   {
@@ -354,6 +375,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.2,
       seniorManagement: 4.1,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Adobe_Systems_logo_and_wordmark.svg/200px-Adobe_Systems_logo_and_wordmark.svg.png",
     },
   },
   {
@@ -370,6 +392,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.5,
       cultureValues: 4.4,
       seniorManagement: 4.3,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/200px-Stripe_Logo%2C_revised_2016.svg.png",
     },
   },
   {
@@ -386,6 +409,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.2,
       cultureValues: 4.1,
       seniorManagement: 4.0,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_B%C3%A9lo.svg/200px-Airbnb_Logo_B%C3%A9lo.svg.png",
     },
   },
   {
@@ -402,6 +426,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.1,
       cultureValues: 3.7,
       seniorManagement: 3.6,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/200px-Uber_logo_2018.svg.png",
     },
   },
   {
@@ -418,6 +443,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.0,
       cultureValues: 3.8,
       seniorManagement: 3.7,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Lyft_logo.svg/200px-Lyft_logo.svg.png",
     },
   },
   {
@@ -434,6 +460,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.3,
       seniorManagement: 4.2,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Slack_Technologies_Logo.svg/200px-Slack_Technologies_Logo.svg.png",
     },
   },
   {
@@ -450,6 +477,7 @@ export const DEMO_COMPANIES = [
       careerOpportunities: 4.3,
       cultureValues: 4.2,
       seniorManagement: 4.1,
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Shopify_logo_2018.svg/200px-Shopify_logo_2018.svg.png",
     },
   },
 ];
