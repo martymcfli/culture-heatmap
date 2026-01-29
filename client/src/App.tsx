@@ -11,6 +11,8 @@ import Comparison from "./pages/Comparison";
 import Favorites from "./pages/Favorites";
 import SavedComparisons from "./pages/SavedComparisons";
 import SalaryBenchmark from "./pages/SalaryBenchmark";
+import JobSearch from "./pages/JobSearch";
+import DemoHeatMap from "./pages/DemoHeatMap";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -24,6 +26,8 @@ function Router() {
       <Route path={"/favorites"} component={Favorites} />
       <Route path={"/saved-comparisons"} component={SavedComparisons} />
       <Route path={"/salary-benchmark"} component={SalaryBenchmark} />
+      <Route path={"/jobs"} component={JobSearch} />
+      <Route path={"/demo"} component={DemoHeatMap} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

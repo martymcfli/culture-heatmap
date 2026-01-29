@@ -204,3 +204,22 @@
 - [x] Write and pass 7 vitest tests for new features
 - [ ] Create frontend UI for comparison page
 - [ ] Create frontend UI for recommendations sidebar
+
+
+## LinkedIn Job Search Feature (NEW)
+- [x] Set up RapidAPI LinkedIn job searcher backend service
+- [x] Create tRPC procedures for job search with parameter handling
+- [x] Build frontend job search page with parameter controls
+- [x] Implement job results display and filtering UI
+- [x] Add job search to navigation and create dedicated tab
+- [x] Test and verify LinkedIn job search functionality (awaiting API key)
+- [ ] Add RapidAPI key when user provides it
+
+
+## Demo Mode Feature (CRITICAL - Public Access)
+- [x] Create demo data service with 20-30 sample companies
+- [x] Add public demo procedure to tRPC router
+- [x] Create demo heat map page accessible without login
+- [x] Add demo banner and upgrade CTA
+- [x] Add Try Demo button to landing page
+- [x] Test demo mode functionality

@@ -51,6 +51,11 @@ export default function Home() {
                       Explore
                     </Button>
                   </Link>
+                  <Link href="/jobs">
+                    <Button variant="ghost" className="text-foreground hover:text-cyan-400 transition-colors">
+                      Jobs
+                    </Button>
+                  </Link>
                   <Link href="/favorites">
                     <Button variant="ghost" size="icon" className="text-foreground hover:text-pink-400 transition-colors">
                       <Heart className="w-5 h-5" />
@@ -93,24 +98,49 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Link href="/heatmap">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold glow"
-                >
-                  Explore Heat Map
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <Link href="/browse">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/20 text-foreground hover:bg-white/5"
-                >
-                  Browse Companies
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link href="/heatmap">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold glow"
+                    >
+                      Explore Heat Map
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link href="/browse">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-white/20 text-foreground hover:bg-white/5"
+                    >
+                      Browse Companies
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/demo">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold glow"
+                    >
+                      Try Demo
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <a href={getLoginUrl()}>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-white/20 text-foreground hover:bg-white/5"
+                    >
+                      Sign In
+                    </Button>
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </section>

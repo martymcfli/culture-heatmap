@@ -382,6 +382,74 @@ export const appRouter = router({
         }
       }),
   }),
+
+  demo: router({
+    getCompanies: publicProcedure.query(async () => {
+      const { getDemoCompanies } = await import('./demo-data');
+      return getDemoCompanies();
+    }),
+
+    getCompanyById: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getDemoCompanyById } = await import('./demo-data');
+        return getDemoCompanyById(input);
+      }),
+
+    filterCompanies: publicProcedure
+      .input(z.object({
+        location: z.string().optional(),
+        industry: z.string().optional(),
+        minScore: z.number().optional(),
+        maxScore: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { filterDemoCompanies } = await import('./demo-data');
+        return filterDemoCompanies(input);
+      }),
+  }),
+
+  linkedinJobs: router({
+    search: publicProcedure
+      .input(z.object({
+        title_filter: z.string().optional(),
+        location_filter: z.string().optional(),
+        description_filter: z.string().optional(),
+        organization_description_filter: z.string().optional(),
+        organization_specialties_filter: z.string().optional(),
+        organization_slug_filter: z.string().optional(),
+        type_filter: z.string().optional(),
+        description_type: z.string().optional(),
+        remote: z.boolean().optional(),
+        industry_filter: z.string().optional(),
+        seniority_filter: z.string().optional(),
+        agency: z.boolean().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+        date_filter: z.string().optional(),
+        directapply: z.boolean().optional(),
+        employees_gte: z.number().optional(),
+        employees_lte: z.number().optional(),
+        order: z.string().optional(),
+        advanced_title_filter: z.string().optional(),
+        include_ai: z.boolean().optional(),
+        ai_work_arrangement_filter: z.string().optional(),
+        ai_experience_level_filter: z.string().optional(),
+        ai_visa_sponsorship_filter: z.boolean().optional(),
+        organization_filter: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { searchLinkedInJobs } = await import('./linkedin-jobs-service');
+        return searchLinkedInJobs(input);
+      }),
+
+    getJobDetails: publicProcedure
+      .input(z.string())
+      .query(async ({ input }) => {
+        const { getLinkedInJobDetails } = await import('./linkedin-jobs-service');
+        return getLinkedInJobDetails(input);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
