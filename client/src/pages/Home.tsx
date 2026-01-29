@@ -278,15 +278,15 @@ export default function Home() {
               </p>
 
               {!isAuthenticated ? (
-                <a href={getLoginUrl()}>
+                <Link href="/demo">
                   <Button
                     size="lg"
                     className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold glow"
                   >
-                    Get Started
+                    Try Demo (No Sign-Up Required)
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
-                </a>
+                </Link>
               ) : (
                 <Link href="/heatmap">
                   <Button

@@ -249,6 +249,25 @@ export const appRouter = router({
         const { getUniqueLevels } = await import('./db');
         return getUniqueLevels();
       }),
+
+    trends: publicProcedure
+      .input(z.object({
+        jobTitle: z.string().optional(),
+        level: z.string().optional(),
+        minSalary: z.number().optional(),
+        maxSalary: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const { getSalaryTrends } = await import('./salary-insights');
+        return getSalaryTrends(input);
+      }),
+
+    rangeByRole: publicProcedure
+      .input(z.string())
+      .query(async ({ input }) => {
+        const { getSalaryRangeByRole } = await import('./salary-insights');
+        return getSalaryRangeByRole(input);
+      }),
   }),
 
   recommendations: router({
@@ -466,7 +485,8 @@ export const appRouter = router({
         return { response };
       }),
   }),
+
+
 });
 
 export type AppRouter = typeof appRouter;
-

@@ -249,3 +249,23 @@
 - [x] Add company comparison detection logic (regex patterns for compare/vs/difference)
 - [x] Create comparison redirect functionality (navigates to /compare with company params)
 - [x] Test chatbot comparison feature (TypeScript compilation successful)
+
+## Conversion Optimization
+- [x] Update CTA language to "Try Demo (No Sign-Up Required)"
+- [x] Reduce friction for first-time visitors
+- [x] Direct unauthenticated users to demo instead of login
+
+
+## Salary Insights Widget
+- [x] Create salary insights data aggregation service
+- [x] Add tRPC procedure for salary trends data (trends + rangeByRole)
+- [x] Build SalaryInsights widget component with filtering
+- [x] Add salary stats cards (avg base, avg total comp, median, highest role)
+- [x] Add bar chart showing top paying roles
+- [x] Add salary breakdown table by role and level
+- [x] TypeScript compilation successful
+
+## CTA Language Updates
+- [x] Change "Get Started" to "Try Demo (No Sign-Up Required)"
+- [x] Update button to link to /demo instead of login URL
+- [x] Removes friction for first-time visitors
