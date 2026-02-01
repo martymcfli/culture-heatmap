@@ -89,16 +89,14 @@ export default function DemoHeatMap() {
     }));
   }, [filteredCompanies]);
 
-  // Get unique industries and locations
+  // Get unique industries and locations from demo data
   const industries = useMemo(() => {
-    const unique = Array.from(new Set(allCompanies.map((c: any) => c.industry)));
-    return unique.sort();
-  }, [allCompanies]);
+    return ["Technology", "Finance", "Healthcare"];
+  }, []);
 
   const locations = useMemo(() => {
-    const unique = Array.from(new Set(allCompanies.map((c: any) => c.headquartersState)));
-    return unique.sort();
-  }, [allCompanies]);
+    return ["CA", "MA", "NC", "NJ", "NY", "ON", "TX", "WA"];
+  }, []);
 
   // Get color based on overall rating with gradient
   const getColorByRating = (rating: number) => {
@@ -157,7 +155,7 @@ export default function DemoHeatMap() {
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
                   <SelectItem value="all">All Industries</SelectItem>
-                  {industries.map((industry) => (
+                  {industries.map((industry: string) => (
                     <SelectItem key={industry} value={industry}>
                       {industry}
                     </SelectItem>
@@ -177,7 +175,7 @@ export default function DemoHeatMap() {
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
                   <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map((location) => (
+                  {locations.map((location: string) => (
                     <SelectItem key={location} value={location}>
                       {location}
                     </SelectItem>

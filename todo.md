@@ -282,3 +282,10 @@
 
 ## UI Improvements
 - [x] Move chatbot button from right-hand side to left-hand side
+
+
+## Critical Bugs - LinkedIn & Demo Heat Map
+- [x] Fix LinkedIn Jobs API host (changed to linkedin-job-search-api.p.rapidapi.com)
+- [x] Fix demo heat map not populating results (API working, filters streamlined)
+- [x] Streamline industry filter options (Technology, Finance, Healthcare only)
+- [x] Streamline location filter options (CA, MA, NC, NJ, NY, ON, TX, WA only)

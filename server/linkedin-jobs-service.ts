@@ -61,7 +61,7 @@ export async function searchLinkedInJobs(
   params: LinkedInJobSearchParams
 ): Promise<LinkedInJobSearchResponse> {
   const apiKey = process.env.RAPIDAPI_LINKEDIN_JOBS_KEY;
-  const apiHost = "linkedin-jobs-api2.p.rapidapi.com";
+  const apiHost = "linkedin-job-search-api.p.rapidapi.com";
 
   if (!apiKey) {
     console.warn("[LinkedIn Jobs] API key not configured. Please set RAPIDAPI_LINKEDIN_JOBS_KEY environment variable.");
@@ -157,7 +157,7 @@ export async function searchLinkedInJobs(
  */
 export async function getLinkedInJobDetails(jobId: string): Promise<LinkedInJob | null> {
   const apiKey = process.env.RAPIDAPI_LINKEDIN_JOBS_KEY;
-  const apiHost = "linkedin-jobs-api2.p.rapidapi.com";
+  const apiHost = "linkedin-job-search-api.p.rapidapi.com";
 
   if (!apiKey) {
     console.warn("[LinkedIn Jobs] API key not configured");
