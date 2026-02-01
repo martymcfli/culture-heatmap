@@ -431,35 +431,15 @@ export const appRouter = router({
   linkedinJobs: router({
     search: publicProcedure
       .input(z.object({
-        title_filter: z.string().optional(),
-        location_filter: z.string().optional(),
-        description_filter: z.string().optional(),
-        organization_description_filter: z.string().optional(),
-        organization_specialties_filter: z.string().optional(),
-        organization_slug_filter: z.string().optional(),
-        type_filter: z.string().optional(),
-        description_type: z.string().optional(),
-        remote: z.boolean().optional(),
-        industry_filter: z.string().optional(),
-        seniority_filter: z.string().optional(),
-        agency: z.boolean().optional(),
-        limit: z.number().optional(),
-        offset: z.number().optional(),
-        date_filter: z.string().optional(),
-        directapply: z.boolean().optional(),
-        employees_gte: z.number().optional(),
-        employees_lte: z.number().optional(),
-        order: z.string().optional(),
-        advanced_title_filter: z.string().optional(),
-        include_ai: z.boolean().optional(),
-        ai_work_arrangement_filter: z.string().optional(),
-        ai_experience_level_filter: z.string().optional(),
-        ai_visa_sponsorship_filter: z.boolean().optional(),
-        organization_filter: z.string().optional(),
+        query: z.string().optional(),
+        page: z.number().optional(),
+        num_pages: z.number().optional(),
+        country: z.string().optional(),
+        date_posted: z.string().optional(),
       }))
       .query(async ({ input }) => {
-        const { searchLinkedInJobs } = await import('./linkedin-jobs-service');
-        return searchLinkedInJobs(input);
+        const { searchJSearchJobs } = await import('./jsearch-jobs-service');
+        return searchJSearchJobs(input);
       }),
 
     getJobDetails: publicProcedure
