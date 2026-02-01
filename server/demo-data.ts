@@ -20,6 +20,8 @@ export const DEMO_COMPANIES = [
       seniorManagement: 4.3,
     },
     logoUrl: "https://www.gstatic.com/images/branding/product/1x/googleg_40dp.png",
+    turnoverRate: 9.5,
+    avgTenure: 4.0,
   },
   {
     id: 2,
@@ -36,6 +38,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.3,
       seniorManagement: 4.2,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/200px-Microsoft_logo.svg.png",
+    turnoverRate: 11.2,
+    avgTenure: 3.9,
     },
   },
   {
@@ -53,6 +57,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.2,
       seniorManagement: 4.1,
     logoUrl: "https://www.apple.com/ac/structured-data/images/open_graph_logo.png",
+    turnoverRate: 13.8,
+    avgTenure: 3.6,
     },
   },
   {
@@ -70,6 +76,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.8,
       seniorManagement: 3.7,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/200px-Amazon_logo.svg.png",
+    turnoverRate: 22.5,
+    avgTenure: 2.8,
     },
   },
   {
@@ -87,6 +95,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.0,
       seniorManagement: 3.9,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc_logo.svg/200px-Meta_Platforms_Inc_logo.svg.png",
+    turnoverRate: 18.3,
+    avgTenure: 3.2,
     },
   },
   {
@@ -104,6 +114,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.6,
       seniorManagement: 3.5,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Tesla_logo.png/200px-Tesla_logo.png",
+    turnoverRate: 28.5,
+    avgTenure: 2.1,
     },
   },
   {
@@ -121,6 +133,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.1,
       seniorManagement: 4.0,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/JPMorgan_Chase_Logo_2008_1.svg/200px-JPMorgan_Chase_Logo_2008_1.svg.png",
+    turnoverRate: 14.5,
+    avgTenure: 3.5,
     },
   },
   {
@@ -138,6 +152,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.9,
       seniorManagement: 3.8,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Goldman_Sachs.svg/200px-Goldman_Sachs.svg.png",
+    turnoverRate: 18.2,
+    avgTenure: 3.2,
     },
   },
   {
@@ -155,6 +171,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.0,
       seniorManagement: 3.9,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Morgan_Stanley_logo.svg/200px-Morgan_Stanley_logo.svg.png",
+    turnoverRate: 16.1,
+    avgTenure: 3.4,
     },
   },
   {
@@ -172,6 +190,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.8,
       seniorManagement: 3.7,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/BofA_logo.svg/200px-BofA_logo.svg.png",
+    turnoverRate: 19.8,
+    avgTenure: 3.0,
     },
   },
   {
@@ -189,6 +209,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.2,
       seniorManagement: 4.1,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Pfizer_logo.svg/200px-Pfizer_logo.svg.png",
+    turnoverRate: 11.8,
+    avgTenure: 3.8,
     },
   },
   {
@@ -206,6 +228,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.3,
       seniorManagement: 4.2,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Johnson_%26_Johnson_logo.svg/200px-Johnson_%26_Johnson_logo.svg.png",
+    turnoverRate: 10.9,
+    avgTenure: 3.9,
     },
   },
   {
@@ -223,6 +247,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.1,
       seniorManagement: 4.0,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Moderna_2020_logo.svg/200px-Moderna_2020_logo.svg.png",
+    turnoverRate: 15.6,
+    avgTenure: 3.4,
     },
   },
   {
@@ -240,6 +266,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.4,
       seniorManagement: 4.3,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Nvidia_logo.svg/200px-Nvidia_logo.svg.png",
+    turnoverRate: 8.9,
+    avgTenure: 4.1,
     },
   },
   {
@@ -257,6 +285,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.9,
       seniorManagement: 3.8,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Intel_logo_%282020%2C_dark_blue%29.svg/200px-Intel_logo_%282020%2C_dark_blue%29.svg.png",
+    turnoverRate: 14.2,
+    avgTenure: 3.6,
     },
   },
   {
@@ -274,6 +304,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.2,
       seniorManagement: 4.1,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/200px-Salesforce.com_logo.svg.png",
+    turnoverRate: 15.3,
+    avgTenure: 3.5,
     },
   },
   {
@@ -291,6 +323,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.7,
       seniorManagement: 3.6,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Oracle_logo.svg/200px-Oracle_logo.svg.png",
+    turnoverRate: 16.8,
+    avgTenure: 3.3,
     },
   },
   {
@@ -308,6 +342,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 3.6,
       seniorManagement: 3.5,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/200px-IBM_logo.svg.png",
+    turnoverRate: 17.5,
+    avgTenure: 3.2,
     },
   },
   {
@@ -359,6 +395,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.3,
       seniorManagement: 4.2,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Netflix_logo.svg/200px-Netflix_logo.svg.png",
+    turnoverRate: 12.1,
+    avgTenure: 3.8,
     },
   },
   {
@@ -376,6 +414,8 @@ export const DEMO_COMPANIES = [
       cultureValues: 4.2,
       seniorManagement: 4.1,
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Adobe_Systems_logo_and_wordmark.svg/200px-Adobe_Systems_logo_and_wordmark.svg.png",
+    turnoverRate: 10.5,
+    avgTenure: 4.0,
     },
   },
   {

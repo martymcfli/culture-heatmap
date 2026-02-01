@@ -37,6 +37,8 @@ export const companies = mysqlTable("companies", {
   headquartersCountry: varchar("headquartersCountry", { length: 100 }),
   logoUrl: text("logoUrl"),
   website: varchar("website", { length: 255 }),
+  turnoverRate: decimal("turnoverRate", { precision: 5, scale: 2 }), // Annual turnover rate as percentage (e.g., 15.50 = 15.5%)
+  avgTenure: decimal("avgTenure", { precision: 4, scale: 2 }), // Average employee tenure in years
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

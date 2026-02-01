@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { AlertCircle, Zap } from "lucide-react";
+import { AlertCircle, Zap, Search, X } from "lucide-react";
 import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
 
@@ -50,6 +50,12 @@ const CustomTooltip = ({ active, payload }: any) => {
             <span className="text-slate-400">Compensation:</span>
             <span className="text-cyan-300 font-semibold">{data.compensation.toFixed(2)}/5</span>
           </div>
+          {data.turnoverRate !== undefined && (
+            <div className="flex justify-between gap-4 pt-2 border-t border-slate-700">
+              <span className="text-slate-400">Turnover Rate:</span>
+              <span className="text-amber-300 font-semibold">{data.turnoverRate.toFixed(1)}%</span>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -60,11 +66,12 @@ const CustomTooltip = ({ active, payload }: any) => {
 export default function DemoHeatMap() {
   const [selectedIndustry, setSelectedIndustry] = useState<string>("all");
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Fetch demo companies
   const { data: allCompanies = [] } = trpc.demo.getCompanies.useQuery();
 
-  // Filter companies
+  // Filter companies by industry, location, and search query
   const filteredCompanies = useMemo(() => {
     return allCompanies.filter((company: any) => {
       if (selectedIndustry !== "all" && company.industry !== selectedIndustry) {
@@ -73,9 +80,12 @@ export default function DemoHeatMap() {
       if (selectedLocation !== "all" && company.headquartersState !== selectedLocation) {
         return false;
       }
+      if (searchQuery && !company.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
       return true;
     });
-  }, [allCompanies, selectedIndustry, selectedLocation]);
+  }, [allCompanies, selectedIndustry, selectedLocation, searchQuery]);
 
   // Prepare data for scatter chart
   const chartData = useMemo(() => {
@@ -86,6 +96,7 @@ export default function DemoHeatMap() {
       compensation: company.aggregateScore?.compensationBenefits || 0,
       industry: company.industry,
       logoUrl: company.logoUrl,
+      turnoverRate: company.turnoverRate,
     }));
   }, [filteredCompanies]);
 
@@ -110,6 +121,30 @@ export default function DemoHeatMap() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+      {/* Company Search Bar */}
+      <div className="border-b border-white/10 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4 flex justify-center">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-3 w-5 h-5 text-white/50" />
+            <input
+              type="text"
+              placeholder="Search companies by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-cyan-500/50 focus:bg-white/15 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-3 text-white/50 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Demo Banner */}
       <div className="bg-amber-900/30 border-b border-amber-700/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -223,7 +258,7 @@ export default function DemoHeatMap() {
                     data={chartData}
                     fill="#06b6d4"
                     fillOpacity={0.8}
-                    r={8}
+                    r={12}
                     shape="circle"
                     isAnimationActive={true}
                     animationDuration={300}
@@ -234,7 +269,7 @@ export default function DemoHeatMap() {
                         dataKey="y"
                         fill={getColorByRating(entry.x)}
                         fillOpacity={0.75}
-                        r={8}
+                        r={12}
                       />
                     ))}
                   </Scatter>

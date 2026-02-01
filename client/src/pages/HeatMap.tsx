@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, ArrowLeft, Zap } from "lucide-react";
+import { Loader2, ArrowLeft, Zap, Search, X } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
@@ -49,9 +49,15 @@ export default function HeatMap() {
   const [viewMode, setViewMode] = useState<"heatmap" | "list">("heatmap");
   const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { data: companies, isLoading } = trpc.companies.filter.useQuery(filters);
 
-  const chartData = (companies as any[])?.map((c: any) => ({
+  // Filter companies by search query
+  const filteredBySearch = (companies as any[])?.filter((c: any) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  const chartData = filteredBySearch.map((c: any) => ({
     name: c.name,
     id: c.id,
     industry: c.industry,
@@ -60,6 +66,7 @@ export default function HeatMap() {
     workLifeBalance: parseFloat(String(c.aggregateScore?.workLifeBalance || 0)),
     overallRating: parseFloat(String(c.aggregateScore?.overallRating || 0)),
     compensationBenefits: parseFloat(String(c.aggregateScore?.compensationBenefits || 0)),
+    turnoverRate: c.turnoverRate,
     color: getColorByScore(parseFloat(String(c.aggregateScore?.overallRating || 0))),
   })) || [];
 
@@ -83,6 +90,11 @@ export default function HeatMap() {
           <p className="text-sm text-gray-400">
             Compensation: <span className="font-semibold text-white">{data.compensationBenefits.toFixed(2)}</span>
           </p>
+          {data.turnoverRate !== undefined && (
+            <p className="text-sm text-gray-400">
+              Turnover Rate: <span className="font-semibold text-amber-300">{data.turnoverRate.toFixed(1)}%</span>
+            </p>
+          )}
           <p className="text-xs text-cyan-400 mt-2">Click to view full profile</p>
         </div>
       );
@@ -110,9 +122,26 @@ export default function HeatMap() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Search Bar */}
+        {/* Company Name Search Bar */}
         <div className="mb-8 flex justify-center">
-          <SearchBar />
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-3 w-5 h-5 text-foreground/50" />
+            <input
+              type="text"
+              placeholder="Search companies by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 bg-white/10 border border-white/20 rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:border-cyan-500/50 focus:bg-white/15 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-3 text-foreground/50 hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Filters */}
@@ -298,6 +327,7 @@ export default function HeatMap() {
                     <Scatter
                       name="Companies"
                       data={chartData}
+                      shape="circle"
                       onClick={(data: any) => {
                         if (data && data.id) {
                           window.location.href = `/company/${data.id}`;

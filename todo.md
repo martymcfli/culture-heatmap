@@ -289,3 +289,20 @@
 - [x] Fix demo heat map not populating results (API working, filters streamlined)
 - [x] Streamline industry filter options (Technology, Finance, Healthcare only)
 - [x] Streamline location filter options (CA, MA, NC, NJ, NY, ON, TX, WA only)
+
+
+## Real-Time Search & Turnover Metrics (COMPLETE)
+- [x] Add real-time search bar to HeatMap page (filters by company name)
+- [x] Add real-time search bar to DemoHeatMap page
+- [x] Research and source employee turnover data for 100+ companies
+- [x] Update database schema to include turnover metrics (turnoverRate, avgTenure)
+- [x] Integrate turnover into company scoring algorithm (weight in overall score)
+- [x] Display turnover metrics in demo heat map tooltips
+- [x] Update demo data with turnover rates for 28 companies
+- [x] Add turnover rates to ALL 119 companies in database (100% coverage)
+- [x] Update authenticated heat map tooltips to show turnover metrics
+- [x] Increase scatter plot dot size for better hover/click targets
+- [x] Add enterprise mobility and staffing companies with high turnover (8.9%-61.2% range)
+- [x] Test search functionality in both authenticated and demo modes
+- [x] Verify turnover metrics display and impact on overall scores
+- [x] All 71 tests passing

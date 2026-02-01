@@ -141,6 +141,11 @@ export async function getAggregateScore(companyId: number) {
   
   if (scores.length === 0) return null;
   
+  // Fetch company to get turnover metrics
+  const company = await db.select().from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+  
   // Calculate average across all sources
   const avg = (field: keyof typeof scores[0]) => {
     const values = scores
@@ -149,8 +154,24 @@ export async function getAggregateScore(companyId: number) {
     return values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
   };
   
+  // Calculate base overall rating with turnover adjustment
+  let baseOverallRating = avg('overallRating');
+  
+  if (company && company.length > 0) {
+    const turnoverRate = company[0].turnoverRate ? parseFloat(String(company[0].turnoverRate)) : null;
+    if (turnoverRate !== null) {
+      let adjustment = 0;
+      if (turnoverRate <= 10) adjustment = 0.3;
+      else if (turnoverRate <= 20) adjustment = 0;
+      else if (turnoverRate <= 30) adjustment = -0.1;
+      else if (turnoverRate <= 40) adjustment = -0.3;
+      else adjustment = -0.5;
+      baseOverallRating = Math.max(1, Math.min(5, baseOverallRating + adjustment));
+    }
+  }
+  
   return {
-    overallRating: avg('overallRating'),
+    overallRating: baseOverallRating,
     workLifeBalance: avg('workLifeBalance'),
     compensationBenefits: avg('compensationBenefits'),
     careerOpportunities: avg('careerOpportunities'),
