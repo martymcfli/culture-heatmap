@@ -90,9 +90,9 @@ export default function HeatMap() {
           <p className="text-sm text-gray-400">
             Compensation: <span className="font-semibold text-white">{data.compensationBenefits.toFixed(2)}</span>
           </p>
-          {data.turnoverRate !== undefined && (
+          {data.turnoverRate !== undefined && data.turnoverRate !== null && (
             <p className="text-sm text-gray-400">
-              Turnover Rate: <span className="font-semibold text-amber-300">{data.turnoverRate.toFixed(1)}%</span>
+              Turnover Rate: <span className="font-semibold text-amber-300">{parseFloat(String(data.turnoverRate)).toFixed(1)}%</span>
             </p>
           )}
           <p className="text-xs text-cyan-400 mt-2">Click to view full profile</p>
