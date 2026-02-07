@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total_companies, COUNT(DISTINCT industry) as total_industries FROM companies;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user HTmx27DwqZhhQqf.root --database Vt5pQowF5i4Txbq3GKFs45 --execute SELECT COUNT(*) as total_companies, COUNT(DISTINCT industry) as total_industries FROM companies;",
+  "rows": [
+    {
+      "total_companies": "182",
+      "total_industries": "32"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_companies\ttotal_industries\n182\t32\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

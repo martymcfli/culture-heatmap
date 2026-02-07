@@ -103,7 +103,15 @@ export default function HeatMap() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div 
+      className="min-h-screen bg-background text-foreground"
+      onClick={(e) => {
+        // Close selection if clicking outside the chart
+        if ((e.target as HTMLElement).closest('.recharts-wrapper') === null) {
+          setSelectedCompany(null);
+        }
+      }}
+    >
       {/* Header */}
       <div className="border-b border-white/5 backdrop-blur-md bg-background/40">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
@@ -271,7 +279,7 @@ export default function HeatMap() {
               <CardHeader>
                 <CardTitle className="text-foreground">Work-Life Balance vs Overall Rating</CardTitle>
                 <CardDescription className="text-foreground/60">
-                  Bubble color represents overall company rating. Hover over bubbles for details.
+                  Bubble color represents overall company rating. Hover over bubbles for details or click to lock tooltip in place.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -330,20 +338,28 @@ export default function HeatMap() {
                       shape="circle"
                       onClick={(data: any) => {
                         if (data && data.id) {
-                          window.location.href = `/company/${data.id}`;
+                          setSelectedCompany(selectedCompany === data.id ? null : data.id);
                         }
                       }}
-                      onMouseEnter={(data: any) => setHoveredCompany(data.id)}
-                      onMouseLeave={() => setHoveredCompany(null)}
+                      onMouseEnter={(data: any) => {
+                        if (!selectedCompany) setHoveredCompany(data.id);
+                      }}
+                      onMouseLeave={() => {
+                        if (!selectedCompany) setHoveredCompany(null);
+                      }}
                     >
                       {chartData.map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
                           fill={entry.color}
-                          fillOpacity={hoveredCompany === entry.id ? 1 : 0.6}
+                          fillOpacity={selectedCompany === entry.id || hoveredCompany === entry.id ? 1 : 0.6}
                           style={{
                             cursor: 'pointer',
-                            filter: hoveredCompany === entry.id ? 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))' : 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))',
+                            filter: selectedCompany === entry.id 
+                              ? 'drop-shadow(0 0 16px rgba(6, 182, 212, 1))' 
+                              : hoveredCompany === entry.id 
+                              ? 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))' 
+                              : 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))',
                             transition: 'all 0.3s ease'
                           }}
                         />
@@ -352,7 +368,7 @@ export default function HeatMap() {
                   </ScatterChart>
                 </ResponsiveContainer>
                 <p className="text-sm text-foreground/60 mt-8 text-center">
-                  ✨ Click on any bubble to view detailed company information
+                  ✨ Click on any bubble to lock tooltip. Click elsewhere to deselect.
                 </p>
               </CardContent>
             </Card>

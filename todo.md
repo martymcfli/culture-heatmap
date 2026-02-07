@@ -316,3 +316,22 @@
 - [x] Simplify filters to query + date_posted (JSearch API parameters)
 - [x] Fix all TypeScript errors (0 errors, 72 tests passing)
 - [x] Jobs search now uses RapidAPI JSearch endpoint with full functionality
+
+
+## Clickable Bubble Selection (COMPLETE)
+- [x] Add click handler to scatter plot bubbles to lock tooltip display
+- [x] Implement state to track selected company in HeatMap
+- [x] Add click-outside handler to deselect and hide tooltip
+- [x] Update HeatMap component with selection logic
+- [x] Update DemoHeatMap component with selection logic
+- [x] Test selection and deselection on both pages
+
+## Expand S&P 500 Companies Database (COMPLETE)
+- [x] Add 85 S&P 500 companies from diverse industries
+- [x] Include healthcare, energy, consumer goods, industrials, utilities, telecom, media, logistics
+- [x] Generate realistic turnover rates by industry
+- [x] Update database with 190+ total companies
+- [x] Update Home.tsx copy to reflect 190+ companies across 15+ industries
+- [x] Update DemoHeatMap banner with accurate company counts
+- [x] Update UI descriptions to match actual data capabilities
+

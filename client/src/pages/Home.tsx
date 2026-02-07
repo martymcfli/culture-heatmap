@@ -93,7 +93,7 @@ export default function Home() {
             </h2>
 
             <p className="text-lg text-foreground/70 mb-8 leading-relaxed">
-              Discover and compare workplace environments across 100+ leading companies across tech, finance, healthcare, and more. Access aggregated ratings from
+              Discover and compare workplace environments across 190+ leading S&P 500 companies spanning 15+ industries including technology, healthcare, finance, energy, retail, and more. Access aggregated ratings from
               Glassdoor, Indeed, and Comparably to find companies that match your values and career goals.
             </p>
 

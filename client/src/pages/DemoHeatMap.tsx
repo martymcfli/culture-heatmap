@@ -168,7 +168,7 @@ export default function DemoHeatMap() {
             Company Culture Heat Map
           </h1>
           <p className="text-slate-400 mt-2">
-            Explore company cultures across industries. Hover over bubbles to see company logos and detailed scores.
+            Explore company cultures across 15+ industries. Click bubbles to lock tooltips. Hover or click to see company logos, ratings, and employee turnover metrics.
           </p>
         </div>
       </div>
