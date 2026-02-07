@@ -15,11 +15,8 @@ import { Loader2, MapPin, Briefcase, Calendar, ExternalLink } from "lucide-react
 
 export default function JobSearch() {
   const [searchParams, setSearchParams] = useState({
-    title_filter: "",
-    location_filter: "",
-    type_filter: "",
-    seniority_filter: "",
-    remote: undefined as boolean | undefined,
+    query: "",
+    date_posted: "all",
     limit: 20,
     offset: 0,
   });
@@ -29,13 +26,11 @@ export default function JobSearch() {
   // Build the full params object for the API call
   const apiParams = useMemo(() => {
     return {
-      title_filter: searchParams.title_filter || undefined,
-      location_filter: searchParams.location_filter || undefined,
-      type_filter: searchParams.type_filter || undefined,
-      seniority_filter: searchParams.seniority_filter || undefined,
-      remote: searchParams.remote,
-      limit: searchParams.limit,
-      offset: searchParams.offset,
+      query: searchParams.query || 'software engineer jobs',
+      page: Math.floor(searchParams.offset / searchParams.limit) + 1,
+      num_pages: 1,
+      country: 'us',
+      date_posted: searchParams.date_posted || 'all',
     };
   }, [searchParams]);
 
@@ -109,129 +104,47 @@ export default function JobSearch() {
         <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 mb-8">
           <h2 className="text-xl font-semibold mb-6 text-cyan-400">Search Filters</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {/* Job Title */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Search Query */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Job Title
+                Search Query
               </label>
               <Input
-                placeholder="e.g., Data Engineer, Product Manager"
-                value={searchParams.title_filter}
+                placeholder="e.g., software engineer in san francisco"
+                value={searchParams.query}
                 onChange={(e) =>
                   setSearchParams((prev) => ({
                     ...prev,
-                    title_filter: e.target.value,
+                    query: e.target.value,
                   }))
                 }
                 className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
               />
             </div>
 
-            {/* Location */}
+            {/* Date Posted */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Location
-              </label>
-              <Input
-                placeholder="e.g., United States, San Francisco"
-                value={searchParams.location_filter}
-                onChange={(e) =>
-                  setSearchParams((prev) => ({
-                    ...prev,
-                    location_filter: e.target.value,
-                  }))
-                }
-                className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
-              />
-            </div>
-
-            {/* Job Type */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Job Type
+                Date Posted
               </label>
               <Select
-                value={searchParams.type_filter}
+                value={searchParams.date_posted}
                 onValueChange={(value) =>
                   setSearchParams((prev) => ({
                     ...prev,
-                    type_filter: value,
+                    date_posted: value,
                   }))
                 }
               >
                 <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select job type" />
+                  <SelectValue placeholder="Select timeframe" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
-                  <SelectItem value="all">All Types</SelectItem>
-                  {jobTypeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Seniority Level */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Seniority Level
-              </label>
-              <Select
-                value={searchParams.seniority_filter}
-                onValueChange={(value) =>
-                  setSearchParams((prev) => ({
-                    ...prev,
-                    seniority_filter: value,
-                  }))
-                }
-              >
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select level" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
-                  <SelectItem value="all">All Levels</SelectItem>
-                  {seniorityOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Remote */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Work Arrangement
-              </label>
-              <Select
-                value={
-                  searchParams.remote === undefined
-                    ? "all"
-                    : String(searchParams.remote)
-                }
-                onValueChange={(value) =>
-                  setSearchParams((prev) => ({
-                    ...prev,
-                    remote:
-                      value === "all"
-                        ? undefined
-                        : value === "true",
-                  }))
-                }
-              >
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select arrangement" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
-                  {remoteOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="month">Last Month</SelectItem>
+                  <SelectItem value="week">Last Week</SelectItem>
+                  <SelectItem value="day">Last Day</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -296,16 +209,16 @@ export default function JobSearch() {
           <>
             <div className="mb-6">
               <p className="text-slate-400">
-                {jobsData.jobs.length === 0
+                {jobsData.data.length === 0
                   ? "No jobs found matching your criteria"
-                  : `Found ${jobsData.jobs.length} jobs`}
+                  : `Found ${jobsData.data.length} jobs`}
               </p>
             </div>
 
-            {jobsData.jobs.length > 0 && (
+            {jobsData.data.length > 0 && (
               <>
                 <div className="space-y-4 mb-8">
-                  {jobsData.jobs.map((job) => (
+                  {jobsData.data.map((job) => (
                     <Card
                       key={job.job_id}
                       className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/50 transition-all p-6 group"
@@ -313,59 +226,59 @@ export default function JobSearch() {
                       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                         <div className="flex-1">
                           <h3 className="text-xl font-semibold text-cyan-400 group-hover:text-cyan-300 transition-colors">
-                            {job.title}
+                            {job.job_title}
                           </h3>
                           <p className="text-lg text-slate-300 mt-1">
-                            {job.company}
+                            {job.employer_name}
                           </p>
 
                           <div className="flex flex-wrap gap-2 mt-3">
-                            {job.location && (
+                            {job.job_city && (
                               <Badge
                                 variant="outline"
                                 className="bg-slate-700/50 border-slate-600 text-slate-300"
                               >
                                 <MapPin className="w-3 h-3 mr-1" />
-                                {job.location}
+                                {job.job_city}
                               </Badge>
                             )}
-                            {job.job_type && (
+                            {job.job_employment_type && (
                               <Badge
                                 variant="outline"
                                 className="bg-slate-700/50 border-slate-600 text-slate-300"
                               >
                                 <Briefcase className="w-3 h-3 mr-1" />
-                                {job.job_type}
+                                {job.job_employment_type}
                               </Badge>
                             )}
-                            {job.seniority_level && (
+                            {job.job_required_experience?.required_experience_in_months && (
                               <Badge
                                 variant="outline"
                                 className="bg-blue-900/50 border-blue-700 text-blue-300"
                               >
-                                {job.seniority_level}
+                                {job.job_required_experience?.required_experience_in_months}
                               </Badge>
                             )}
-                            {job.remote && (
+                            {job.job_is_remote && (
                               <Badge className="bg-green-900/50 border-green-700 text-green-300">
                                 Remote
                               </Badge>
                             )}
-                            {job.posted_date && (
+                            {job.job_posted_at_datetime_utc && (
                               <Badge
                                 variant="outline"
                                 className="bg-slate-700/50 border-slate-600 text-slate-300"
                               >
                                 <Calendar className="w-3 h-3 mr-1" />
-                                {new Date(job.posted_date).toLocaleDateString()}
+                                {new Date(job.job_posted_at_datetime_utc).toLocaleDateString()}
                               </Badge>
                             )}
                           </div>
                         </div>
 
-                        {job.apply_url && (
+                        {job.job_apply_link && (
                           <a
-                            href={job.apply_url}
+                            href={job.job_apply_link}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all whitespace-nowrap"
@@ -397,7 +310,7 @@ export default function JobSearch() {
                   <Button
                     onClick={handleNextPage}
                     disabled={
-                      jobsData.jobs.length < searchParams.limit || isLoading
+                      jobsData.data.length < searchParams.limit || isLoading
                     }
                     variant="outline"
                     className="border-slate-600 text-slate-300 hover:bg-slate-700/50"
