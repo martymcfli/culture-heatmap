@@ -335,3 +335,11 @@
 - [x] Update DemoHeatMap banner with accurate company counts
 - [x] Update UI descriptions to match actual data capabilities
 
+
+
+## Industry Sections UI Fix (COMPLETE)
+- [x] Make industry sections start collapsed instead of expanded
+- [x] Add expand/collapse toggle for each industry
+- [x] Improve visibility with better colors and contrast (cyan highlights, better borders)
+- [x] Reduce dropdown height by collapsing by default
+- [x] Test on HeatMap page
