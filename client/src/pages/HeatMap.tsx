@@ -40,7 +40,7 @@ const getScoreLabel = (score: number | null | undefined) => {
 export default function HeatMap() {
   const [filters, setFilters] = useState({
     location: "",
-    industry: "",
+    industries: [] as string[],
     sizeRange: "",
     minScore: 0,
     maxScore: 5,
@@ -50,7 +50,10 @@ export default function HeatMap() {
   const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: companies, isLoading } = trpc.companies.filter.useQuery(filters);
+  const { data: companies, isLoading } = trpc.companies.filter.useQuery({
+    ...filters,
+    industry: filters.industries.length > 0 ? filters.industries[0] : "",
+  });
 
   // Filter companies by search query
   const filteredBySearch = (companies as any[])?.filter((c: any) =>
@@ -177,8 +180,8 @@ export default function HeatMap() {
 
               <div className="space-y-2">
                 <IndustrySections
-                  selectedIndustry={filters.industry}
-                  onSelectIndustry={(industry) => setFilters({ ...filters, industry })}
+                  selectedIndustries={filters.industries}
+                  onSelectIndustry={(industries) => setFilters({ ...filters, industries })}
                 />
               </div>
 
@@ -216,7 +219,7 @@ export default function HeatMap() {
               <div className="lg:col-span-3">
                 <Button 
                   variant="outline" 
-                  onClick={() => setFilters({ location: "", industry: "", sizeRange: "", minScore: 0, maxScore: 5 })}
+                  onClick={() => setFilters({ location: "", industries: [], sizeRange: "", minScore: 0, maxScore: 5 })}
                 >
                   Reset Filters
                 </Button>
@@ -431,7 +434,7 @@ export default function HeatMap() {
               <p className="text-foreground/60 mb-4">No companies found matching your filters.</p>
               <Button 
                 variant="outline" 
-                onClick={() => setFilters({ location: "", industry: "", sizeRange: "", minScore: 0, maxScore: 5 })}
+                onClick={() => setFilters({ location: "", industries: [], sizeRange: "", minScore: 0, maxScore: 5 })}
                 className="hover:bg-cyan-500/20 hover:border-cyan-500"
               >
                 Reset Filters

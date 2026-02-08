@@ -185,6 +185,7 @@ export async function getAggregateScore(companyId: number) {
 export async function getFilteredCompanies(filters: {
   location?: string;
   industry?: string;
+  industries?: string[];
   sizeRange?: string;
   minScore?: number;
   maxScore?: number;
@@ -203,7 +204,10 @@ export async function getFilteredCompanies(filters: {
     );
   }
   
-  if (filters.industry) {
+  // Support both single industry and multiple industries
+  if (filters.industries && filters.industries.length > 0) {
+    results = results.filter(c => c.industry && filters.industries!.includes(c.industry));
+  } else if (filters.industry) {
     results = results.filter(c => c.industry === filters.industry);
   }
   

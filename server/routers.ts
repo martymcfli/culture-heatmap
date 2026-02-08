@@ -42,6 +42,7 @@ export const appRouter = router({
       .input(z.object({
         location: z.string().optional(),
         industry: z.string().optional(),
+        industries: z.array(z.string()).optional(),
         sizeRange: z.string().optional(),
         minScore: z.number().optional(),
         maxScore: z.number().optional(),
