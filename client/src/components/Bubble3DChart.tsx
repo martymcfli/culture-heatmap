@@ -37,7 +37,8 @@ export function Bubble3DChart({ companies, onBubbleClick }: Bubble3DChartProps) 
       0.1,
       1000
     );
-    camera.position.z = 80;
+    camera.position.z = 40;
+    camera.position.y = 5;
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -81,10 +82,10 @@ export function Bubble3DChart({ companies, onBubbleClick }: Bubble3DChartProps) 
       
       const mesh = new THREE.Mesh(geometry, material);
       
-      // Distribute bubbles in 3D space
+      // Distribute bubbles in 3D space (more compact for better visibility)
       const angle = Math.random() * Math.PI * 2;
-      const elevation = (Math.random() - 0.5) * Math.PI;
-      const distance = 30 + Math.random() * 30;
+      const elevation = (Math.random() - 0.5) * Math.PI * 0.6;
+      const distance = 15 + Math.random() * 20;
       
       mesh.position.x = Math.cos(angle) * Math.cos(elevation) * distance;
       mesh.position.y = Math.sin(elevation) * distance;
