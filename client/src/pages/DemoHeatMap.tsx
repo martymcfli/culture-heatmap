@@ -155,7 +155,7 @@ export default function DemoHeatMap() {
               <a href={getLoginUrl()} className="ml-2 underline hover:text-amber-100">
                 Sign in
               </a>
-              {" "}to see all 100+ companies and unlock full features.
+              {" "}to see all 300+ companies and unlock full features.
             </p>
           </div>
         </div>
@@ -389,7 +389,7 @@ export default function DemoHeatMap() {
           <Zap className="w-12 h-12 mx-auto text-blue-400 mb-4" />
           <h3 className="text-2xl font-bold text-white mb-3">Unlock Full Access</h3>
           <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
-            Sign in to explore all 100+ companies, compare salaries, view interview questions, get AI-powered recommendations, and search LinkedIn jobs.
+            Sign in to explore all 300+ companies, compare salaries, view interview questions, get AI-powered recommendations, and search LinkedIn jobs.
           </p>
           <a href={getLoginUrl()}>
             <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold px-8 py-3">
