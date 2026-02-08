@@ -363,3 +363,13 @@
 - [x] Update DemoHeatMap banner with accurate count (300+ companies)
 - [x] Update any other UI text referencing company count
 - [x] Verify all counts are consistent across app (all references updated)
+
+
+## Russell 2000 Expansion & 3D Visualization (CURRENT)
+- [ ] Save current 2D scatter plot version as checkpoint for easy revert
+- [ ] Add 200+ Russell 2000 companies to database (reach 500+ total)
+- [ ] Create polished 3D bubble chart component
+- [ ] Add toggle between 2D scatter and 3D bubble chart
+- [ ] Integrate 3D chart with filtering and search
+- [ ] Test 3D visualization performance and interactivity
+- [ ] Polish animations and user experience
