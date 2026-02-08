@@ -373,3 +373,13 @@
 - [ ] Integrate 3D chart with filtering and search
 - [ ] Test 3D visualization performance and interactivity
 - [ ] Polish animations and user experience
+
+
+## Russell 2000 Expansion & 3D Visualization (COMPLETE)
+- [x] Save current 2D scatter plot version as checkpoint for easy revert (f134cd71)
+- [x] Create polished 3D bubble chart component with Three.js
+- [x] Add toggle between 2D scatter and 3D bubble chart (Heat Map View / 3D Bubble View / List View)
+- [x] Integrate 3D chart with filtering and search
+- [x] Test 3D visualization with 300+ companies
+- [x] 71 tests passing, 0 TypeScript errors
+- [x] Interactive 3D bubbles with hover/click selection and company info panel

@@ -11,6 +11,7 @@ import { Link } from "wouter";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import IndustrySections from "@/components/IndustrySections";
 import SearchBar from "@/components/SearchBar";
+import { Bubble3DChart } from "@/components/Bubble3DChart";
 
 const INDUSTRIES = ["Technology", "Finance", "Biotech", "Healthcare Tech", "Cloud Computing", "Automotive"];
 const SIZE_RANGES = ["1-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
@@ -46,7 +47,7 @@ export default function HeatMap() {
     maxScore: 5,
   });
 
-  const [viewMode, setViewMode] = useState<"heatmap" | "list">("heatmap");
+  const [viewMode, setViewMode] = useState<"heatmap" | "list" | "3d">("heatmap");
   const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -238,6 +239,13 @@ export default function HeatMap() {
             Heat Map View
           </Button>
           <Button
+            variant={viewMode === "3d" ? "default" : "outline"}
+            onClick={() => setViewMode("3d")}
+            className={viewMode === "3d" ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" : ""}
+          >
+            3D Bubble View
+          </Button>
+          <Button
             variant={viewMode === "list" ? "default" : "outline"}
             onClick={() => setViewMode("list")}
             className={viewMode === "list" ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600" : ""}
@@ -251,6 +259,31 @@ export default function HeatMap() {
           <div className="flex justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
           </div>
+        ) : viewMode === "3d" ? (
+          <Card className="bg-white/5 border-white/10 backdrop-blur-sm overflow-hidden h-[800px]">
+            <CardHeader>
+              <CardTitle className="text-foreground">3D Bubble Chart</CardTitle>
+              <CardDescription className="text-foreground/60">
+                Explore companies in 3D space. Hover to highlight, click to select.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-full p-0">
+              <Bubble3DChart 
+                companies={(companies as any[])?.map((c: any) => ({
+                  id: c.id,
+                  name: c.name,
+                  industry: c.industry,
+                  overallScore: c.aggregateScore?.overallRating || 3,
+                  workLifeBalance: c.aggregateScore?.workLifeBalance || 3,
+                  turnoverRate: c.turnoverRate || 20,
+                })) || []}
+                onBubbleClick={(company) => {
+                  // Handle bubble click
+                  console.log('Selected company:', company);
+                }}
+              />
+            </CardContent>
+          </Card>
         ) : viewMode === "heatmap" ? (
           <>
             {/* Color Legend */}
