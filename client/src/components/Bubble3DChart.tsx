@@ -240,7 +240,7 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
             <p><span className="text-cyan-400">Industry:</span> {selectedCompany.industry}</p>
             <p><span className="text-cyan-400">Overall Score:</span> {selectedCompany.overallScore.toFixed(2)}</p>
             <p><span className="text-cyan-400">Work-Life Balance:</span> {selectedCompany.workLifeBalance.toFixed(2)}</p>
-            <p><span className="text-cyan-400">Turnover Rate:</span> {selectedCompany.turnoverRate.toFixed(1)}%</p>
+            <p><span className="text-cyan-400">Turnover Rate:</span> {parseFloat(String(selectedCompany.turnoverRate)).toFixed(1)}%</p>
           </div>
         </div>
       )}

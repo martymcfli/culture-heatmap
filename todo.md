@@ -392,3 +392,6 @@
 - [x] Update HeatMap search to trigger focus on 3D chart
 - [x] Test search-to-focus with various company names
 - [x] Verify smooth transitions and animations
+- [x] Fix turnoverRate formatting bug in company info panel
+- [x] Fix dev server EMFILE errors with inotify watch limit
+- [x] Optimize vite file watcher configuration

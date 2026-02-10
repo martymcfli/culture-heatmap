@@ -183,5 +183,24 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    watch: {
+      ignored: [
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/dist/**",
+        "**/.next/**",
+        "**/build/**",
+        "**/.manus/**",
+        "**/.manus-logs/**",
+        "**/.webdev/**",
+        "**/pnpm-lock.yaml",
+        "**/*.lock",
+      ],
+      usePolling: false,
+      awaitWriteFinish: {
+        stabilityThreshold: 100,
+        pollInterval: 100,
+      },
+    },
   },
 });
