@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,6 +51,7 @@ export default function HeatMap() {
   const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [focusCompanyId, setFocusCompanyId] = useState<string | undefined>(undefined);
   const { data: companies, isLoading } = trpc.companies.filter.useQuery({
     ...filters,
     industry: filters.industries.length > 0 ? filters.industries[0] : "",
@@ -73,6 +74,15 @@ export default function HeatMap() {
     turnoverRate: c.turnoverRate,
     color: getColorByScore(parseFloat(String(c.aggregateScore?.overallRating || 0))),
   })) || [];
+
+  useEffect(() => {
+    if (searchQuery && filteredBySearch.length > 0 && viewMode === "3d") {
+      const matchedCompany = filteredBySearch[0];
+      setFocusCompanyId(matchedCompany.id);
+    } else {
+      setFocusCompanyId(undefined);
+    }
+  }, [searchQuery, filteredBySearch, viewMode]);
 
   const CustomTooltip = (props: any) => {
     const { active, payload } = props;
@@ -277,6 +287,7 @@ export default function HeatMap() {
                   workLifeBalance: c.aggregateScore?.workLifeBalance || 3,
                   turnoverRate: c.turnoverRate || 20,
                 })) || []}
+                focusCompanyId={focusCompanyId}
                 onBubbleClick={(company) => {
                   // Handle bubble click
                   console.log('Selected company:', company);

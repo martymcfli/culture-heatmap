@@ -13,9 +13,10 @@ interface Company {
 interface Bubble3DChartProps {
   companies: Company[];
   onBubbleClick?: (company: Company) => void;
+  focusCompanyId?: string;
 }
 
-export function Bubble3DChart({ companies, onBubbleClick }: Bubble3DChartProps) {
+export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubble3DChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -181,7 +182,53 @@ export function Bubble3DChart({ companies, onBubbleClick }: Bubble3DChartProps) 
       });
       renderer.dispose();
     };
-  }, [companies, onBubbleClick]);
+  }, [companies, onBubbleClick, focusCompanyId]);
+
+  // Handle focus on specific company
+  useEffect(() => {
+    if (!focusCompanyId || !bubblesRef.current || !cameraRef.current) return;
+
+    const focusedBubble = bubblesRef.current.get(focusCompanyId);
+    if (!focusedBubble) return;
+
+    // Get bubble position
+    const bubblePos = focusedBubble.position.clone();
+
+    // Animate camera to focus on bubble
+    const startPos = cameraRef.current.position.clone();
+    const endPos = bubblePos.clone();
+    endPos.z += 15; // Position camera 15 units away from bubble
+    endPos.y += 5;
+
+    const duration = 1000; // 1 second animation
+    const startTime = Date.now();
+
+    const animateCamera = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function (ease-out cubic)
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+      if (cameraRef.current) {
+        cameraRef.current.position.lerpVectors(startPos, endPos, easeProgress);
+        cameraRef.current.lookAt(bubblePos);
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animateCamera);
+      }
+    };
+
+    animateCamera();
+
+    // Highlight the focused bubble with glow effect
+    if (focusedBubble.material instanceof THREE.MeshPhongMaterial) {
+      focusedBubble.material.emissiveIntensity = 1.0;
+    }
+    focusedBubble.scale.set(1.5, 1.5, 1.5);
+    setSelectedCompany(focusedBubble.userData.company);
+  }, [focusCompanyId]);
 
   return (
     <div className="w-full h-full">

@@ -383,3 +383,12 @@
 - [x] Test 3D visualization with 300+ companies
 - [x] 71 tests passing, 0 TypeScript errors
 - [x] Interactive 3D bubbles with hover/click selection and company info panel
+
+
+## Search-to-Focus Feature for 3D Chart (COMPLETE)
+- [x] Update Bubble3DChart to support focus and highlight on specific company
+- [x] Add smooth camera animation to zoom to focused company
+- [x] Highlight focused bubble with glow effect
+- [x] Update HeatMap search to trigger focus on 3D chart
+- [x] Test search-to-focus with various company names
+- [x] Verify smooth transitions and animations
