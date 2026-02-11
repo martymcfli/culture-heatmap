@@ -395,3 +395,17 @@
 - [x] Fix turnoverRate formatting bug in company info panel
 - [x] Fix dev server EMFILE errors with inotify watch limit
 - [x] Optimize vite file watcher configuration
+
+
+## 3D Chart UX Improvements (COMPLETE)
+- [x] Zoom camera closer to bubbles (z: 15 instead of 40) for better visibility
+- [x] Increase bubble size variation (0.8-3.3 range) based on overall score
+- [x] Position bubbles on X-axis by Work-Life Balance metric
+- [x] Position bubbles on Y-axis by Turnover Rate metric (inverted)
+- [x] Implement hover-to-preview info panel (temporary display)
+- [x] Implement click-to-pin info panel (persistent with cyan border)
+- [x] Add close button (✕) to unpin info panels
+- [x] Fix TypeScript errors in material/scale property access
+- [x] Test hover and click interactions with multiple bubbles
+- [x] Verify info panel stays visible after clicking
+- [x] Verify "See More Details" button is accessible
