@@ -1,0 +1,20 @@
+CREATE TABLE `anonymousReviews` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`companyId` int NOT NULL,
+	`rating` decimal(3,2) NOT NULL,
+	`title` varchar(255),
+	`reviewText` text,
+	`pros` text,
+	`cons` text,
+	`jobTitle` varchar(255),
+	`employmentStatus` varchar(50),
+	`workLifeBalance` decimal(3,2),
+	`compensationBenefits` decimal(3,2),
+	`careerOpportunities` decimal(3,2),
+	`cultureValues` decimal(3,2),
+	`seniorManagement` decimal(3,2),
+	`isHelpful` int DEFAULT 0,
+	`isFlagged` int DEFAULT 0,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `anonymousReviews_id` PRIMARY KEY(`id`)
+);
