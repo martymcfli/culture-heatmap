@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-interface Company {
+export interface Company {
   id: string;
   name: string;
   industry: string;
@@ -14,25 +14,24 @@ interface Company {
 
 interface Bubble3DChartProps {
   companies: Company[];
-  onBubbleClick?: (company: Company) => void;
+  onHover?: (company: Company | null) => void;
+  onClick?: (company: Company) => void;
   focusCompanyId?: string;
 }
 
-export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubble3DChartProps) {
+export function Bubble3DChart({ companies, onHover, onClick, focusCompanyId }: Bubble3DChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const bubblesRef = useRef<Map<string, THREE.Mesh>>(new Map());
-  const [hoveredCompany, setHoveredCompany] = useState<Company | null>(null);
-  const [pinnedCompany, setPinnedCompany] = useState<Company | null>(null);
   const hoveredBubbleRef = useRef<THREE.Mesh | null>(null);
   const pinnedBubbleRef = useRef<THREE.Mesh | null>(null);
 
+  // Initialize Three.js scene
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f172a);
     sceneRef.current = scene;
@@ -43,9 +42,8 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
       0.1,
       1000
     );
-    // Zoom in much closer for better bubble visibility
-    camera.position.z = 15;
-    camera.position.y = 2;
+    camera.position.z = 12;
+    camera.position.y = 1;
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -57,12 +55,11 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
-
     const pointLight = new THREE.PointLight(0xffffff, 0.9);
     pointLight.position.set(50, 50, 50);
     scene.add(pointLight);
 
-    // Create bubbles with metric-based positioning
+    // Create bubbles
     const bubbles = new Map<string, THREE.Mesh>();
     const colorMap = new Map<string, number>();
     const industries = Array.from(new Set(companies.map(c => c.industry)));
@@ -72,7 +69,7 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
       colorMap.set(industry, hue);
     });
 
-    // Calculate ranges for normalization
+    // Calculate ranges - ZOOM IN on metrics for better spread
     const scores = companies.map(c => c.overallScore);
     const balances = companies.map(c => c.workLifeBalance);
     const turnoverRates = companies.map(c => c.turnoverRate);
@@ -90,9 +87,9 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
     const turnoverRange = maxTurnover - minTurnover || 1;
 
     companies.forEach((company) => {
-      // Size based on overall score (larger range for visibility)
+      // Size based on overall score (larger range)
       const normalizedScore = (company.overallScore - minScore) / scoreRange;
-      const size = 0.8 + normalizedScore * 2.5;
+      const size = 0.6 + normalizedScore * 3.0;
       
       const geometry = new THREE.SphereGeometry(size, 32, 32);
       
@@ -109,21 +106,18 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
       
       const mesh = new THREE.Mesh(geometry, material);
       
-      // Position based on metrics for better spread
-      // X-axis: Work-Life Balance (normalized to -8 to 8)
+      // ZOOM IN on work-life balance (use smaller scale range)
       const normalizedBalance = (company.workLifeBalance - minBalance) / balanceRange;
-      const posX = (normalizedBalance * 16) - 8;
+      const posX = (normalizedBalance * 120) - 60;
       
-      // Y-axis: Turnover Rate (inverted, normalized to -6 to 6)
+      // ZOOM IN on turnover rate (use smaller scale range)
       const normalizedTurnover = (company.turnoverRate - minTurnover) / turnoverRange;
-      const posY = 6 - (normalizedTurnover * 12);
+      const posY = 8 - (normalizedTurnover * 16);
       
-      // Z-axis: Random spread with some variation
-      const posZ = (Math.random() - 0.5) * 8;
+      const posZ = (Math.random() - 0.5) * 10;
       
       mesh.position.set(posX, posY, posZ);
-      
-      mesh.userData = { company, originalEmissiveIntensity: 0.3 };
+      mesh.userData = { company };
       scene.add(mesh);
       bubbles.set(company.id, mesh);
     });
@@ -142,33 +136,32 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(Array.from(bubbles.values()));
 
-      // Reset previously hovered bubble (but keep pinned bubble highlighted)
+      // Reset previous hover
       if (hoveredBubbleRef.current && hoveredBubbleRef.current !== pinnedBubbleRef.current) {
         const material = hoveredBubbleRef.current.material as THREE.MeshPhongMaterial;
         material.emissiveIntensity = 0.3;
         hoveredBubbleRef.current.scale.set(1, 1, 1);
       }
 
-      // Highlight hovered bubble
       if (intersects.length > 0) {
         const hovered = intersects[0].object as THREE.Mesh;
-        const hoveredCompany = hovered.userData.company;
+        const company = hovered.userData.company;
         
-        // Don't override pinned bubble styling
         if (hovered !== pinnedBubbleRef.current) {
           const material = hovered.material as THREE.MeshPhongMaterial;
           material.emissiveIntensity = 0.8;
           hovered.scale.set(1.3, 1.3, 1.3);
           hoveredBubbleRef.current = hovered;
-          setHoveredCompany(hoveredCompany);
+          console.log('Hover:', company.name);
+          onHover?.(company);
         }
       } else {
-        setHoveredCompany(null);
+        onHover?.(null);
         hoveredBubbleRef.current = null;
       }
     };
 
-    const onClick = (event: MouseEvent) => {
+    const onMouseClick = (event: MouseEvent) => {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -180,50 +173,43 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
         const clicked = intersects[0].object as THREE.Mesh;
         const company = clicked.userData.company;
         
-        // If clicking the same pinned bubble, unpin it
-        if (pinnedCompany?.id === company.id) {
-          setPinnedCompany(null);
+        if (pinnedBubbleRef.current?.userData?.company?.id === company.id) {
+          // Unpin
           pinnedBubbleRef.current = null;
           const material = clicked.material as THREE.MeshPhongMaterial;
           material.emissiveIntensity = 0.3;
           clicked.scale.set(1, 1, 1);
         } else {
-          // Pin new bubble
-          // Reset previously pinned bubble
+          // Pin new
           if (pinnedBubbleRef.current) {
             const prevMaterial = pinnedBubbleRef.current.material as THREE.MeshPhongMaterial;
             prevMaterial.emissiveIntensity = 0.3;
             pinnedBubbleRef.current.scale.set(1, 1, 1);
           }
           
-          setPinnedCompany(company);
           pinnedBubbleRef.current = clicked;
           const material = clicked.material as THREE.MeshPhongMaterial;
           material.emissiveIntensity = 1.0;
           clicked.scale.set(1.4, 1.4, 1.4);
         }
         
-        onBubbleClick?.(company);
+        console.log('Click:', company.name);
+        onClick?.(company);
       }
     };
 
     renderer.domElement.addEventListener('mousemove', onMouseMove);
-    renderer.domElement.addEventListener('click', onClick);
+    renderer.domElement.addEventListener('click', onMouseClick);
 
-    // Animation loop
     let animationId: number;
     const animate = () => {
       animationId = requestAnimationFrame(animate);
-
-      // Slow rotation for visual interest
       scene.rotation.x += 0.0001;
       scene.rotation.y += 0.0002;
-
       renderer.render(scene, camera);
     };
     animate();
 
-    // Handle window resize
     const handleResize = () => {
       if (!containerRef.current) return;
       const width = containerRef.current.clientWidth;
@@ -235,11 +221,10 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
 
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       renderer.domElement.removeEventListener('mousemove', onMouseMove);
-      renderer.domElement.removeEventListener('click', onClick);
+      renderer.domElement.removeEventListener('click', onMouseClick);
       cancelAnimationFrame(animationId);
       if (containerRef.current?.contains(renderer.domElement)) {
         containerRef.current.removeChild(renderer.domElement);
@@ -250,19 +235,16 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
       });
       renderer.dispose();
     };
-  }, [companies, onBubbleClick]);
+  }, [companies, onHover, onClick]);
 
-  // Handle focus on specific company (from search)
+  // Handle focus
   useEffect(() => {
     if (!focusCompanyId || !bubblesRef.current || !cameraRef.current) return;
 
     const focusedBubble = bubblesRef.current.get(focusCompanyId);
     if (!focusedBubble) return;
 
-    // Get bubble position
     const bubblePos = focusedBubble.position.clone();
-
-    // Animate camera to focus on bubble
     const startPos = cameraRef.current.position.clone();
     const endPos = bubblePos.clone();
     endPos.z += 8;
@@ -270,7 +252,6 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
 
     const startTime = Date.now();
     const duration = 1000;
-
     const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
     const animateCamera = () => {
@@ -289,69 +270,11 @@ export function Bubble3DChart({ companies, onBubbleClick, focusCompanyId }: Bubb
     };
 
     animateCamera();
-
-    // Highlight focused bubble
-    bubblesRef.current.forEach((bubble) => {
-      if (bubble.userData.company.id === focusCompanyId) {
-        const material = bubble.material as THREE.MeshPhongMaterial;
-        material.emissiveIntensity = 1.0;
-        bubble.scale.set(1.4, 1.4, 1.4);
-      } else {
-        const material = bubble.material as THREE.MeshPhongMaterial;
-        material.emissiveIntensity = 0.3;
-        bubble.scale.set(1, 1, 1);
-      }
-    });
   }, [focusCompanyId]);
 
-  // Determine which company info to show
-  const displayedCompany = pinnedCompany || hoveredCompany;
-  const isPinned = pinnedCompany !== null;
-
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative bg-slate-950">
       <div ref={containerRef} className="w-full h-full" />
-      
-      {displayedCompany && (
-        <div className={`absolute top-4 right-4 bg-slate-900/95 border rounded-lg p-5 max-w-sm shadow-lg z-50 transition-all ${
-          isPinned ? 'border-cyan-400' : 'border-cyan-500/30'
-        }`}>
-          {isPinned && (
-            <button
-              onClick={() => {
-                setPinnedCompany(null);
-                if (pinnedBubbleRef.current) {
-                  const material = pinnedBubbleRef.current.material as THREE.MeshPhongMaterial;
-                  material.emissiveIntensity = 0.3;
-                  pinnedBubbleRef.current.scale.set(1, 1, 1);
-                }
-                pinnedBubbleRef.current = null;
-              }}
-              className="absolute top-2 right-2 text-slate-400 hover:text-slate-200 text-lg font-bold"
-            >
-              ✕
-            </button>
-          )}
-          
-          <h3 className="text-cyan-400 font-bold text-lg mb-3 pr-6">{displayedCompany.name}</h3>
-          
-          <div className="text-slate-300 text-sm space-y-2">
-            <p><span className="text-cyan-400 font-semibold">Industry:</span> {displayedCompany.industry}</p>
-            <p><span className="text-cyan-400 font-semibold">Overall Score:</span> {displayedCompany.overallScore.toFixed(2)}/5.0</p>
-            <p><span className="text-cyan-400 font-semibold">Work-Life Balance:</span> {displayedCompany.workLifeBalance.toFixed(2)}/5.0</p>
-            <p><span className="text-cyan-400 font-semibold">Turnover Rate:</span> {parseFloat(String(displayedCompany.turnoverRate)).toFixed(1)}%</p>
-          </div>
-          
-          <button className="mt-4 w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-semibold py-2 px-3 rounded transition-colors">
-            See More Details
-          </button>
-          
-          {!isPinned && (
-            <p className="text-xs text-slate-400 mt-3 italic">Click to pin this info</p>
-          )}
-        </div>
-      )}
-      
       <div className="absolute bottom-4 left-4 text-slate-400 text-xs pointer-events-none">
         <p>Hover to preview • Click to pin</p>
       </div>

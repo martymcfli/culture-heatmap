@@ -11,7 +11,8 @@ import { Link } from "wouter";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import IndustrySections from "@/components/IndustrySections";
 import SearchBar from "@/components/SearchBar";
-import { Bubble3DChart } from "@/components/Bubble3DChart";
+import { Bubble3DChart, type Company } from "@/components/Bubble3DChart";
+import { CompanyModal } from "@/components/CompanyModal";
 
 const INDUSTRIES = ["Technology", "Finance", "Biotech", "Healthcare Tech", "Cloud Computing", "Automotive"];
 const SIZE_RANGES = ["1-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
@@ -52,6 +53,7 @@ export default function HeatMap() {
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [focusCompanyId, setFocusCompanyId] = useState<string | undefined>(undefined);
+  const [pinnedCompany, setPinnedCompany] = useState<Company | null>(null);
   const { data: companies, isLoading } = trpc.companies.filter.useQuery({
     ...filters,
     industry: filters.industries.length > 0 ? filters.industries[0] : "",
@@ -288,9 +290,13 @@ export default function HeatMap() {
                   turnoverRate: c.turnoverRate || 20,
                 })) || []}
                 focusCompanyId={focusCompanyId}
-                onBubbleClick={(company) => {
-                  // Handle bubble click
-                  console.log('Selected company:', company);
+                onClick={(company: Company) => {
+                  setPinnedCompany(company);
+                }}
+                onHover={(company) => {
+                  if (!pinnedCompany) {
+                    setPinnedCompany(company);
+                  }
                 }}
               />
             </CardContent>
@@ -487,6 +493,12 @@ export default function HeatMap() {
           </Card>
         )}
       </div>
+      
+      <CompanyModal 
+        company={pinnedCompany} 
+        isOpen={pinnedCompany !== null}
+        onClose={() => setPinnedCompany(null)}
+      />
     </div>
   );
 }

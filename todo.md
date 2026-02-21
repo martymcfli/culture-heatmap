@@ -409,3 +409,24 @@
 - [x] Test hover and click interactions with multiple bubbles
 - [x] Verify info panel stays visible after clicking
 - [x] Verify "See More Details" button is accessible
+
+
+## 3D Bubble Chart Improvements (CURRENT)
+- [ ] Fix info panel to show on hover and stay visible on click
+- [ ] Zoom in on work-life balance metrics (0.1-0.2 scale range) for better spread
+- [ ] Zoom in on turnover rate metrics for better spread
+- [ ] Add 20+ low-culture companies (scores 1.0-2.5) to database
+- [ ] Test that bubbles are well-distributed across 3D space
+- [ ] Implement side-by-side comparison feature (select multiple companies)
+- [ ] Implement save for later feature (save companies to personal dashboard)
+- [ ] Create personal dashboard page for saved companies
+
+
+## 3D Bubble Chart Modal Info Panel (COMPLETE)
+- [x] Implement modal popup for company information display
+- [x] Modal shows on bubble click and stays visible
+- [x] Display company name, industry, and metrics (Overall Score, Work-Life Balance, Turnover Rate)
+- [x] Add "See More Details" button that users can click while modal is open
+- [x] Add close button to dismiss modal
+- [x] Test modal with various companies
+- [x] Verify modal stays open for user interaction
