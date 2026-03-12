@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -108,6 +108,24 @@ export default function DemoHeatMap() {
   const locations = useMemo(() => {
     return ["CA", "MA", "NC", "NJ", "NY", "ON", "TX", "WA"];
   }, []);
+
+  // Compute tight axis domain and 0.2-increment ticks from actual data
+  const computeAxisConfig = useCallback((values: number[], step: number = 0.2) => {
+    const valid = values.filter((v) => v > 0);
+    if (!valid.length) return { domain: [0, 5] as [number, number], ticks: [] as number[] };
+    const rawMin = Math.min(...valid);
+    const rawMax = Math.max(...valid);
+    const paddedMin = Math.max(0, Math.floor(rawMin / step) * step - step);
+    const paddedMax = Math.min(5, Math.ceil(rawMax / step) * step + step);
+    const ticks: number[] = [];
+    for (let v = paddedMin; v <= paddedMax + 0.001; v = Math.round((v + step) * 100) / 100) {
+      ticks.push(Math.round(v * 100) / 100);
+    }
+    return { domain: [paddedMin, paddedMax] as [number, number], ticks };
+  }, []);
+
+  const xConfig = useMemo(() => computeAxisConfig(chartData.map((d) => d.x)), [chartData, computeAxisConfig]);
+  const yConfig = useMemo(() => computeAxisConfig(chartData.map((d) => d.y)), [chartData, computeAxisConfig]);
 
   // Get color based on overall rating with gradient
   const getColorByRating = (rating: number) => {
@@ -231,7 +249,7 @@ export default function DemoHeatMap() {
           <p className="text-slate-400 text-sm mb-4">Hover over bubbles to see company logos and detailed metrics</p>
 
           {chartData.length > 0 ? (
-            <div className="w-full h-96">
+            <div className="w-full h-[600px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -239,17 +257,23 @@ export default function DemoHeatMap() {
                     type="number"
                     dataKey="x"
                     name="Overall Rating"
-                    domain={[0, 5]}
+                    domain={xConfig.domain}
+                    ticks={xConfig.ticks}
+                    tickFormatter={(v: number) => v.toFixed(1)}
                     stroke="#94a3b8"
-                    label={{ value: "Overall Rating →", position: "insideBottomRight", offset: -10 }}
+                    tick={{ fill: "#94a3b8", fontSize: 11 }}
+                    label={{ value: "Overall Rating →", position: "insideBottomRight", offset: -10, fill: "#94a3b8" }}
                   />
                   <YAxis
                     type="number"
                     dataKey="y"
                     name="Work-Life Balance"
-                    domain={[0, 5]}
+                    domain={yConfig.domain}
+                    ticks={yConfig.ticks}
+                    tickFormatter={(v: number) => v.toFixed(1)}
                     stroke="#94a3b8"
-                    label={{ value: "Work-Life Balance →", angle: -90, position: "insideLeft" }}
+                    tick={{ fill: "#94a3b8", fontSize: 11 }}
+                    label={{ value: "Work-Life Balance →", angle: -90, position: "insideLeft", fill: "#94a3b8" }}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: "3 3" }} />
                   <Legend />
