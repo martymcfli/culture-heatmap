@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useRoute } from "wouter";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -10,9 +9,6 @@ import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import IndustrySections from "@/components/IndustrySections";
-import SearchBar from "@/components/SearchBar";
-import { Bubble3DChart, type Company } from "@/components/Bubble3DChart";
-import { CompanyModal } from "@/components/CompanyModal";
 
 const INDUSTRIES = ["Technology", "Finance", "Biotech", "Healthcare Tech", "Cloud Computing", "Automotive"];
 const SIZE_RANGES = ["1-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
@@ -39,6 +35,31 @@ const getScoreLabel = (score: number | null | undefined) => {
   return "Poor";
 };
 
+/**
+ * Compute axis domain and tick marks at `step` increments,
+ * zoomed tightly around the actual data range with a little padding.
+ */
+const computeAxisConfig = (values: number[], step: number = 0.2) => {
+  const valid = values.filter((v) => v > 0);
+  if (!valid.length) {
+    // Fallback: full 0-5 range at 0.5 increments
+    return {
+      domain: [0, 5] as [number, number],
+      ticks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
+    };
+  }
+  const rawMin = Math.min(...valid);
+  const rawMax = Math.max(...valid);
+  const paddedMin = Math.max(0, Math.floor(rawMin / step) * step - step);
+  const paddedMax = Math.min(5, Math.ceil(rawMax / step) * step + step);
+
+  const ticks: number[] = [];
+  for (let v = paddedMin; v <= paddedMax + 0.001; v = Math.round((v + step) * 100) / 100) {
+    ticks.push(Math.round(v * 100) / 100);
+  }
+  return { domain: [paddedMin, paddedMax] as [number, number], ticks };
+};
+
 export default function HeatMap() {
   const [filters, setFilters] = useState({
     location: "",
@@ -48,12 +69,11 @@ export default function HeatMap() {
     maxScore: 5,
   });
 
-  const [viewMode, setViewMode] = useState<"heatmap" | "list" | "3d">("heatmap");
+  const [viewMode, setViewMode] = useState<"heatmap" | "list">("heatmap");
   const [hoveredCompany, setHoveredCompany] = useState<number | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [focusCompanyId, setFocusCompanyId] = useState<string | undefined>(undefined);
-  const [pinnedCompany, setPinnedCompany] = useState<Company | null>(null);
+
   const { data: companies, isLoading } = trpc.companies.filter.useQuery({
     ...filters,
     industry: filters.industries.length > 0 ? filters.industries[0] : "",
@@ -77,14 +97,9 @@ export default function HeatMap() {
     color: getColorByScore(parseFloat(String(c.aggregateScore?.overallRating || 0))),
   })) || [];
 
-  useEffect(() => {
-    if (searchQuery && filteredBySearch.length > 0 && viewMode === "3d") {
-      const matchedCompany = filteredBySearch[0];
-      setFocusCompanyId(matchedCompany.id);
-    } else {
-      setFocusCompanyId(undefined);
-    }
-  }, [searchQuery, filteredBySearch, viewMode]);
+  // Compute tight axis configs from actual data
+  const xConfig = computeAxisConfig(chartData.map((d) => d.overallRating));
+  const yConfig = computeAxisConfig(chartData.map((d) => d.workLifeBalance));
 
   const CustomTooltip = (props: any) => {
     const { active, payload } = props;
@@ -119,11 +134,10 @@ export default function HeatMap() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-background text-foreground"
       onClick={(e) => {
-        // Close selection if clicking outside the chart
-        if ((e.target as HTMLElement).closest('.recharts-wrapper') === null) {
+        if ((e.target as HTMLElement).closest(".recharts-wrapper") === null) {
           setSelectedCompany(null);
         }
       }}
@@ -184,7 +198,7 @@ export default function HeatMap() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Locations</SelectItem>
-                    {LOCATIONS.map(loc => (
+                    {LOCATIONS.map((loc) => (
                       <SelectItem key={loc} value={loc}>{loc}</SelectItem>
                     ))}
                   </SelectContent>
@@ -206,7 +220,7 @@ export default function HeatMap() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Sizes</SelectItem>
-                    {SIZE_RANGES.map(size => (
+                    {SIZE_RANGES.map((size) => (
                       <SelectItem key={size} value={size}>{size}</SelectItem>
                     ))}
                   </SelectContent>
@@ -230,8 +244,8 @@ export default function HeatMap() {
               </div>
 
               <div className="lg:col-span-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setFilters({ location: "", industries: [], sizeRange: "", minScore: 0, maxScore: 5 })}
                 >
                   Reset Filters
@@ -251,13 +265,6 @@ export default function HeatMap() {
             Heat Map View
           </Button>
           <Button
-            variant={viewMode === "3d" ? "default" : "outline"}
-            onClick={() => setViewMode("3d")}
-            className={viewMode === "3d" ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" : ""}
-          >
-            3D Bubble View
-          </Button>
-          <Button
             variant={viewMode === "list" ? "default" : "outline"}
             onClick={() => setViewMode("list")}
             className={viewMode === "list" ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600" : ""}
@@ -271,36 +278,6 @@ export default function HeatMap() {
           <div className="flex justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
           </div>
-        ) : viewMode === "3d" ? (
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm overflow-hidden h-[800px]">
-            <CardHeader>
-              <CardTitle className="text-foreground">3D Bubble Chart</CardTitle>
-              <CardDescription className="text-foreground/60">
-                Explore companies in 3D space. Hover to highlight, click to select.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-full p-0">
-              <Bubble3DChart 
-                companies={(companies as any[])?.map((c: any) => ({
-                  id: c.id,
-                  name: c.name,
-                  industry: c.industry,
-                  overallScore: c.aggregateScore?.overallRating || 3,
-                  workLifeBalance: c.aggregateScore?.workLifeBalance || 3,
-                  turnoverRate: c.turnoverRate || 20,
-                })) || []}
-                focusCompanyId={focusCompanyId}
-                onClick={(company: Company) => {
-                  setPinnedCompany(company);
-                }}
-                onHover={(company) => {
-                  if (!pinnedCompany) {
-                    setPinnedCompany(company);
-                  }
-                }}
-              />
-            </CardContent>
-          </Card>
         ) : viewMode === "heatmap" ? (
           <>
             {/* Color Legend */}
@@ -316,8 +293,8 @@ export default function HeatMap() {
                     { score: 3.0, label: "Poor", color: "#ef4444" },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full shadow-lg" 
+                      <div
+                        className="w-4 h-4 rounded-full shadow-lg"
                         style={{ backgroundColor: item.color }}
                       />
                       <span className="text-sm text-foreground/70">{item.label}</span>
@@ -335,53 +312,57 @@ export default function HeatMap() {
                   Bubble color represents overall company rating. Hover over bubbles for details or click to lock tooltip in place.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-2 md:p-6">
                 <ResponsiveContainer width="100%" height={600}>
-                  <ScatterChart 
-                    margin={{ top: 20, right: 20, bottom: 80, left: 80 }} 
+                  <ScatterChart
+                    margin={{ top: 20, right: 40, bottom: 80, left: 80 }}
                     data={chartData}
                   >
-                    <CartesianGrid 
-                      strokeDasharray="3 3" 
-                      stroke="rgba(255,255,255,0.1)" 
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(255,255,255,0.1)"
                       vertical={true}
                       horizontal={true}
                     />
-                    <XAxis 
-                      dataKey="overallRating" 
-                      name="Overall Rating" 
+                    <XAxis
+                      dataKey="overallRating"
+                      name="Overall Rating"
                       type="number"
-                      domain={[0, 5]}
-                      label={{ 
-                        value: 'Overall Company Rating', 
-                        position: 'insideBottomRight', 
+                      domain={xConfig.domain}
+                      ticks={xConfig.ticks}
+                      tickFormatter={(v: number) => v.toFixed(1)}
+                      label={{
+                        value: "Overall Company Rating",
+                        position: "insideBottomRight",
                         offset: -10,
-                        fill: '#9ca3af',
+                        fill: "#9ca3af",
                         fontSize: 14,
-                        fontWeight: 600
+                        fontWeight: 600,
                       }}
                       stroke="#6b7280"
-                      tick={{ fill: '#9ca3af' }}
+                      tick={{ fill: "#9ca3af", fontSize: 11 }}
                     />
-                    <YAxis 
-                      dataKey="workLifeBalance" 
+                    <YAxis
+                      dataKey="workLifeBalance"
                       name="Work-Life Balance"
                       type="number"
-                      domain={[0, 5]}
-                      label={{ 
-                        value: 'Work-Life Balance Score', 
-                        angle: -90, 
-                        position: 'insideLeft',
-                        fill: '#9ca3af',
+                      domain={yConfig.domain}
+                      ticks={yConfig.ticks}
+                      tickFormatter={(v: number) => v.toFixed(1)}
+                      label={{
+                        value: "Work-Life Balance Score",
+                        angle: -90,
+                        position: "insideLeft",
+                        fill: "#9ca3af",
                         fontSize: 14,
-                        fontWeight: 600
+                        fontWeight: 600,
                       }}
                       stroke="#6b7280"
-                      tick={{ fill: '#9ca3af' }}
+                      tick={{ fill: "#9ca3af", fontSize: 11 }}
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend 
-                      wrapperStyle={{ color: '#9ca3af', paddingTop: '20px' }}
+                    <Legend
+                      wrapperStyle={{ color: "#9ca3af", paddingTop: "20px" }}
                       verticalAlign="bottom"
                       height={36}
                     />
@@ -402,18 +383,19 @@ export default function HeatMap() {
                       }}
                     >
                       {chartData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
+                        <Cell
+                          key={`cell-${index}`}
                           fill={entry.color}
                           fillOpacity={selectedCompany === entry.id || hoveredCompany === entry.id ? 1 : 0.6}
                           style={{
-                            cursor: 'pointer',
-                            filter: selectedCompany === entry.id 
-                              ? 'drop-shadow(0 0 16px rgba(6, 182, 212, 1))' 
-                              : hoveredCompany === entry.id 
-                              ? 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))' 
-                              : 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))',
-                            transition: 'all 0.3s ease'
+                            cursor: "pointer",
+                            filter:
+                              selectedCompany === entry.id
+                                ? "drop-shadow(0 0 16px rgba(6, 182, 212, 1))"
+                                : hoveredCompany === entry.id
+                                ? "drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))"
+                                : "drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))",
+                            transition: "all 0.3s ease",
                           }}
                         />
                       ))}
@@ -442,11 +424,11 @@ export default function HeatMap() {
                           <>
                             <div className="text-right">
                               <div className="text-sm text-foreground/60">Overall Rating</div>
-                              <div 
+                              <div
                                 className="text-3xl font-bold rounded-lg px-3 py-1"
                                 style={{
                                   color: getColorByScore(company.aggregateScore.overallRating),
-                                  textShadow: `0 0 10px ${getColorByScore(company.aggregateScore.overallRating)}40`
+                                  textShadow: `0 0 10px ${getColorByScore(company.aggregateScore.overallRating)}40`,
                                 }}
                               >
                                 {company.aggregateScore.overallRating.toFixed(1)}
@@ -457,11 +439,11 @@ export default function HeatMap() {
                             </div>
                             <div className="text-right">
                               <div className="text-sm text-foreground/60">Work-Life</div>
-                              <div 
+                              <div
                                 className="text-3xl font-bold rounded-lg px-3 py-1"
                                 style={{
                                   color: getColorByScore(company.aggregateScore.workLifeBalance),
-                                  textShadow: `0 0 10px ${getColorByScore(company.aggregateScore.workLifeBalance)}40`
+                                  textShadow: `0 0 10px ${getColorByScore(company.aggregateScore.workLifeBalance)}40`,
                                 }}
                               >
                                 {company.aggregateScore.workLifeBalance.toFixed(1)}
@@ -482,8 +464,8 @@ export default function HeatMap() {
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardContent className="pt-12 text-center">
               <p className="text-foreground/60 mb-4">No companies found matching your filters.</p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setFilters({ location: "", industries: [], sizeRange: "", minScore: 0, maxScore: 5 })}
                 className="hover:bg-cyan-500/20 hover:border-cyan-500"
               >
@@ -493,12 +475,6 @@ export default function HeatMap() {
           </Card>
         )}
       </div>
-      
-      <CompanyModal 
-        company={pinnedCompany} 
-        isOpen={pinnedCompany !== null}
-        onClose={() => setPinnedCompany(null)}
-      />
     </div>
   );
 }
