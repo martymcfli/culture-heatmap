@@ -2,6 +2,10 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 // Generate login URL at runtime so redirect URI reflects the current origin.
 export const getLoginUrl = () => {
+  // When Clerk is configured, we never redirect to the Manus OAuth portal.
+  // Sign-in is handled by Clerk's modal triggered from within the app.
+  if (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) return "#";
+
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
   const appId = import.meta.env.VITE_APP_ID;
 

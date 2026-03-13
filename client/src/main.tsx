@@ -18,10 +18,17 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (typeof window === "undefined") return;
 
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
-
   if (!isUnauthorized) return;
 
-  window.location.href = getLoginUrl();
+  const loginUrl = getLoginUrl();
+  // When Clerk is configured, getLoginUrl() returns "#" — fire a custom event
+  // so the ClerkSignIn component can intercept and open Clerk's modal instead.
+  if (loginUrl === "#") {
+    window.dispatchEvent(new CustomEvent("clerk:open-sign-in"));
+    return;
+  }
+
+  window.location.href = loginUrl;
 };
 
 queryClient.getQueryCache().subscribe(event => {

@@ -1,39 +1,19 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useClerk, useUser, useAuth as useClerkAuth } from "@clerk/react";
+import { useState, useMemo, useCallback, useRef } from "react";
+import { useClerk } from "@clerk/react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
 
-// ─── Clerk sync (null-render, only mounted inside ClerkProvider) ───────────────
+// ─── Demo sign-in trigger (wires handleSignIn ref to Clerk openSignIn) ────────
 const ClerkSignIn = ({
   triggerRef,
 }: {
   triggerRef: React.MutableRefObject<(() => void) | null>;
 }) => {
   const { openSignIn } = useClerk();
-  const { isSignedIn } = useUser();
-  const { getToken } = useClerkAuth();
-
+  // Keep the ref current so handleSignIn() in DemoHeatMap calls Clerk's modal
   triggerRef.current = () => openSignIn();
-
-  useEffect(() => {
-    if (!isSignedIn) return;
-    let active = true;
-    getToken().then((token) => {
-      if (!token || !active) return;
-      fetch("/api/auth/clerk-sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ token }),
-      }).then((r) => {
-        if (r.ok && active) window.location.href = "/heatmap";
-      });
-    });
-    return () => { active = false; };
-  }, [isSignedIn, getToken]);
-
   return null;
 };
 
