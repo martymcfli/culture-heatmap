@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useClerk, useUser, useAuth } from "@clerk/react";
+import { useClerk, useUser, useAuth as useClerkAuth } from "@clerk/react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
@@ -12,7 +13,7 @@ const ClerkSignIn = ({
 }) => {
   const { openSignIn } = useClerk();
   const { isSignedIn } = useUser();
-  const { getToken } = useAuth();
+  const { getToken } = useClerkAuth();
 
   triggerRef.current = () => openSignIn();
 
@@ -35,6 +36,70 @@ const ClerkSignIn = ({
 
   return null;
 };
+
+// ─── Bookmark button (save for later) ────────────────────────────────────────
+const BookmarkButton = ({
+  companyId,
+  isAuthenticated,
+  onSignIn,
+}: {
+  companyId: number;
+  isAuthenticated: boolean;
+  onSignIn: () => void;
+}) => {
+  const utils = trpc.useUtils();
+  const { data: isSaved, isLoading } = trpc.favorites.check.useQuery(companyId, {
+    enabled: isAuthenticated && companyId > 0,
+  });
+  const addMutation = trpc.favorites.add.useMutation({
+    onSuccess: () => utils.favorites.check.invalidate(companyId),
+  });
+  const removeMutation = trpc.favorites.remove.useMutation({
+    onSuccess: () => utils.favorites.check.invalidate(companyId),
+  });
+
+  if (!isAuthenticated) {
+    return (
+      <button
+        onClick={onSignIn}
+        className="flex items-center gap-2 text-sm text-slate-400 hover:text-cyan-400 transition-colors"
+      >
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        Save for later
+      </button>
+    );
+  }
+
+  const toggle = () => {
+    if (isSaved) {
+      removeMutation.mutate(companyId);
+    } else {
+      addMutation.mutate(companyId);
+    }
+  };
+
+  const busy = isLoading || addMutation.isPending || removeMutation.isPending;
+
+  return (
+    <button
+      onClick={toggle}
+      disabled={busy}
+      className={`flex items-center gap-2 text-sm font-medium transition-colors ${isSaved ? "text-cyan-400 hover:text-red-400" : "text-slate-400 hover:text-cyan-400"}`}
+    >
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill={isSaved ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+      </svg>
+      {isSaved ? "Saved" : "Save for later"}
+    </button>
+  );
+};
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -255,10 +320,12 @@ const CompanyModal = ({
   company,
   onClose,
   onSignIn,
+  isAuthenticated,
 }: {
   company: any;
   onClose: () => void;
   onSignIn: () => void;
+  isAuthenticated: boolean;
 }) => {
   if (!company) return null;
   const score = company.aggregateScore;
@@ -304,12 +371,19 @@ const CompanyModal = ({
               <p className="text-slate-400 text-sm">{company.industry}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-slate-700/50 flex-shrink-0"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <BookmarkButton
+              companyId={company.id}
+              isAuthenticated={isAuthenticated}
+              onSignIn={onSignIn}
+            />
+            <button
+              onClick={onClose}
+              className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-slate-700/50"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="p-5 space-y-5">
@@ -441,6 +515,7 @@ export default function DemoHeatMap() {
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
   const [showSignIn, setShowSignIn] = useState(false);
   const clerkSignInRef = useRef<(() => void) | null>(null);
+  const { isAuthenticated } = useAuth();
 
   const handleSignIn = useCallback(() => {
     if (clerkSignInRef.current) {
@@ -542,6 +617,7 @@ export default function DemoHeatMap() {
           company={selectedCompany}
           onClose={() => setSelectedCompany(null)}
           onSignIn={handleSignIn}
+          isAuthenticated={isAuthenticated}
         />
       )}
 
@@ -744,38 +820,58 @@ export default function DemoHeatMap() {
           )}
         </Card>
 
-        {/* Legend */}
+        {/* Legend + axis guide */}
         <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-5 mb-8">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-            Culture Score Legend
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { color: "#10b981", range: "4.5–5.0", label: "Excellent" },
-              { color: "#06b6d4", range: "4.2–4.5", label: "Very Good" },
-              { color: "#3b82f6", range: "3.9–4.2", label: "Good" },
-              { color: "#8b5cf6", range: "3.6–3.9", label: "Fair" },
-              { color: "#f59e0b", range: "3.3–3.6", label: "Below Avg" },
-              { color: "#ef4444", range: "< 3.3", label: "Poor" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-2.5">
-                <div
-                  className="w-5 h-5 rounded-full flex-shrink-0"
-                  style={{
-                    backgroundColor: item.color,
-                    boxShadow: `0 0 8px ${item.color}60`,
-                  }}
-                />
+          <div className="flex flex-col sm:flex-row gap-6">
+            {/* Color legend */}
+            <div className="flex-1">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                Bubble Color — Culture Score
+              </h3>
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { color: "#10b981", range: "4.5–5.0", label: "Excellent" },
+                  { color: "#06b6d4", range: "4.2–4.5", label: "Very Good" },
+                  { color: "#3b82f6", range: "3.9–4.2", label: "Good" },
+                  { color: "#8b5cf6", range: "3.6–3.9", label: "Fair" },
+                  { color: "#f59e0b", range: "3.3–3.6", label: "Below Avg" },
+                  { color: "#ef4444", range: "< 3.3", label: "Poor" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-2.5">
+                    <div
+                      className="w-5 h-5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: item.color, boxShadow: `0 0 8px ${item.color}60` }}
+                    />
+                    <div>
+                      <span className="text-white text-sm font-medium">{item.label}</span>
+                      <span className="text-slate-500 text-xs ml-1.5">{item.range}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Axis guide */}
+            <div className="sm:w-56 border-t sm:border-t-0 sm:border-l border-slate-700/60 sm:pl-6 pt-4 sm:pt-0">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                Axis Guide
+              </h3>
+              <div className="space-y-3">
                 <div>
-                  <span className="text-white text-sm font-medium">
-                    {item.label}
-                  </span>
-                  <span className="text-slate-500 text-xs ml-1.5">
-                    {item.range}
-                  </span>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">X-axis (horizontal)</p>
+                  <p className="text-sm text-white font-medium">Overall Culture Rating</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Composite employee satisfaction score across all dimensions (1–5).</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Y-axis (vertical)</p>
+                  <p className="text-sm text-white font-medium">Work-Life Balance</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Employee-reported balance between work demands and personal time (1–5).</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Bubble number</p>
+                  <p className="text-xs text-slate-400">The rating shown inside each bubble is its overall culture score.</p>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </Card>
 
