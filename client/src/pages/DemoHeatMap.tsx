@@ -1,5 +1,40 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useClerk, useUser, useAuth } from "@clerk/react";
 import { trpc } from "@/lib/trpc";
+
+const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+
+// ─── Clerk sync (null-render, only mounted inside ClerkProvider) ───────────────
+const ClerkSignIn = ({
+  triggerRef,
+}: {
+  triggerRef: React.MutableRefObject<(() => void) | null>;
+}) => {
+  const { openSignIn } = useClerk();
+  const { isSignedIn } = useUser();
+  const { getToken } = useAuth();
+
+  triggerRef.current = () => openSignIn();
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let active = true;
+    getToken().then((token) => {
+      if (!token || !active) return;
+      fetch("/api/auth/clerk-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ token }),
+      }).then((r) => {
+        if (r.ok && active) window.location.href = "/heatmap";
+      });
+    });
+    return () => { active = false; };
+  }, [isSignedIn, getToken]);
+
+  return null;
+};
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +66,53 @@ import {
   ChevronRight,
   Lock,
   Award,
+  Mail,
+  Linkedin,
 } from "lucide-react";
-import { getLoginUrl } from "@/const";
+
+// ─── Request-demo modal (replaces broken OAuth sign-in) ───────────────────────
+const SignInModal = ({ onClose }: { onClose: () => void }) => (
+  <>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60]" onClick={onClose} />
+    <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-[60] p-8">
+      <button onClick={onClose} className="absolute right-4 top-4 text-slate-500 hover:text-white">
+        <X className="w-5 h-5" />
+      </button>
+      <div className="text-center mb-6">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center mx-auto mb-4">
+          <Zap className="w-7 h-7 text-blue-400" />
+        </div>
+        <h2 className="text-2xl font-black text-white mb-2">Full Platform Demo</h2>
+        <p className="text-slate-400 text-sm leading-relaxed">
+          This is a live portfolio project. The full platform — including 300+ companies,
+          job search, salary benchmarks, and AI recommendations — is operational.
+          Reach out to see it in action.
+        </p>
+      </div>
+      <div className="space-y-3">
+        <a
+          href="mailto:mcmcowen@gmail.com?subject=Culture Heat Map Demo Request"
+          className="flex items-center justify-center gap-3 w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+        >
+          <Mail className="w-4 h-4" />
+          Request a Live Demo
+        </a>
+        <a
+          href="https://www.linkedin.com/in/owen-p-mccormick/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-3 w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 px-6 rounded-xl transition-all"
+        >
+          <Linkedin className="w-4 h-4 text-blue-400" />
+          Connect on LinkedIn
+        </a>
+      </div>
+      <p className="text-center text-xs text-slate-600 mt-4">
+        Built with React, tRPC, PostgreSQL & OpenAI
+      </p>
+    </div>
+  </>
+);
 
 // ─── Color helpers ────────────────────────────────────────────────────────────
 const getColorByRating = (rating: number) => {
@@ -174,9 +254,11 @@ const CustomTooltip = ({ active, payload }: any) => {
 const CompanyModal = ({
   company,
   onClose,
+  onSignIn,
 }: {
   company: any;
   onClose: () => void;
+  onSignIn: () => void;
 }) => {
   if (!company) return null;
   const score = company.aggregateScore;
@@ -334,12 +416,13 @@ const CompanyModal = ({
                 </li>
               ))}
             </ul>
-            <a href={getLoginUrl()} className="block">
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-2.5">
-                Sign In Free — No Credit Card
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </a>
+            <button
+              onClick={onSignIn}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-1 transition-all"
+            >
+              Sign In Free — No Credit Card
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </button>
             <p className="text-center text-xs text-slate-500 mt-2">
               Takes 30 seconds. No trial. No paywall.
             </p>
@@ -356,6 +439,16 @@ export default function DemoHeatMap() {
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const clerkSignInRef = useRef<(() => void) | null>(null);
+
+  const handleSignIn = useCallback(() => {
+    if (clerkSignInRef.current) {
+      clerkSignInRef.current();
+    } else {
+      setShowSignIn(true);
+    }
+  }, []);
 
   const { data: allCompanies = [] } = trpc.demo.getCompanies.useQuery();
 
@@ -438,11 +531,17 @@ export default function DemoHeatMap() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+      {/* Clerk integration — mounts Clerk hooks when Clerk is configured */}
+      {CLERK_KEY && <ClerkSignIn triggerRef={clerkSignInRef} />}
+      {/* Sign-in / demo request modal (fallback when Clerk not configured) */}
+      {showSignIn && <SignInModal onClose={() => setShowSignIn(false)} />}
+
       {/* Company panel */}
       {selectedCompany && (
         <CompanyModal
           company={selectedCompany}
           onClose={() => setSelectedCompany(null)}
+          onSignIn={handleSignIn}
         />
       )}
 
@@ -480,7 +579,7 @@ export default function DemoHeatMap() {
               Job search, salary data & AI recommendations are locked.
             </p>
           </div>
-          <a href={getLoginUrl()} className="flex-shrink-0">
+          <a href="#" onClick={(e) => { e.preventDefault(); handleSignIn(); }} className="flex-shrink-0">
             <Button
               size="sm"
               className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-xs px-5"
@@ -500,7 +599,7 @@ export default function DemoHeatMap() {
           <p className="text-slate-400 mt-2 text-sm">
             Click any bubble or card to see the full culture breakdown.{" "}
             <a
-              href={getLoginUrl()}
+              href="#" onClick={(e) => { e.preventDefault(); handleSignIn(); }}
               className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors"
             >
               Sign in free
@@ -695,7 +794,7 @@ export default function DemoHeatMap() {
               </p>
             </div>
           </div>
-          <a href={getLoginUrl()} className="flex-shrink-0">
+          <a href="#" onClick={(e) => { e.preventDefault(); handleSignIn(); }} className="flex-shrink-0">
             <Button className="bg-blue-500 hover:bg-blue-400 text-white font-bold whitespace-nowrap px-6">
               Unlock Job Search →
             </Button>
@@ -806,7 +905,7 @@ export default function DemoHeatMap() {
           <p className="text-slate-500 text-sm mb-7">
             No credit card. No trial period. Just sign in.
           </p>
-          <a href={getLoginUrl()}>
+          <a href="#" onClick={(e) => { e.preventDefault(); handleSignIn(); }}>
             <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold px-12 py-3 text-base rounded-xl shadow-lg shadow-blue-900/40">
               Sign In Free — Unlock Everything →
             </Button>

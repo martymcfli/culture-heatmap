@@ -1,4 +1,5 @@
 export const ENV = {
+  clerkSecretKey: process.env.CLERK_SECRET_KEY ?? "",
   appId: process.env.VITE_APP_ID ?? "",
   cookieSecret: process.env.JWT_SECRET ?? "",
   databaseUrl: process.env.DATABASE_URL ?? "",
